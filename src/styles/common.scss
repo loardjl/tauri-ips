@@ -1,0 +1,69 @@
+$base-bg-color: rgb(40, 45, 67);
+$base-bg-color-light: rgb(59, 61, 76);
+$base-bg-color-light-1: rgba(59, 61, 76, 0.8);
+$base-page-bg-color: rgb(225, 225, 225);
+$base-block-bg-color:rgb(241,241,241);
+$base-size: 24px;
+$base-error-color: rgb(252, 12, 3);
+@mixin active {
+  background: rgb(245, 154, 41);
+  color: #fff;
+}
+@function getColor($color, $opacity: 1) {
+  @if $color == "red" {
+    @return rgba(255, 52, 52, $opacity);
+  } @else if $color == "yellow" {
+    @return rgba(253, 171, 62, $opacity);
+  } @else if $color == "blue" {
+    @return rgb(15, 146, 218, $opacity);
+  } @else if $color == "green" {
+    @return rgba(37, 163, 84, $opacity);
+  } @else if $color == "purple" {
+    @return rgba(207, 170, 255, $opacity);
+  } @else if $color == "orange" {
+    @return rgba(235, 106, 2, $opacity);
+  }
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.flex-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.flex-column-between {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.flex-column-end {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.font24 {
+  font-size: 24px;
+  font-weight: 400;
+}

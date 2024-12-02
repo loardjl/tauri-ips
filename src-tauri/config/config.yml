@@ -1,0 +1,51 @@
+dc:
+  http:
+    host: 172.16.10.75
+    port: 10010
+    port_decision: 10010
+    url: /datacenter
+    pre_url: /datacenter
+    decision_url: /decision
+  tcp:
+    host: 172.16.10.75
+    port: 9135
+cloud:
+  mcm:
+    host: 192.168.0.61
+    port: 9117
+  iedp:
+    host: 192.168.0.61
+    port: 8089
+
+ips:
+  tcp:
+    host: 172.16.10.36
+    port: 9142
+  http:
+    host: 192.168.10.151
+    port: 9998
+
+local:
+  http:
+    port: 25572
+
+show_logo: true
+
+eoms:
+  http:
+    host: 192.168.10.151
+    port: 10010
+
+monitor:
+  enable: true
+  mqtt:
+    host: '192.168.0.18:1883'
+  dir:
+    win_error: 'C:\\Windows\\Minidump'
+  interval:
+    win_orrer: 300000
+    services: 300000
+    all_lathe: 300000
+    device: 300000
+    alarm: 300000
+  env: prod

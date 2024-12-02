@@ -1,0 +1,56 @@
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
+  $colors: (
+    "primary": (
+      "base": rgb(65, 180, 207),
+      "success": rgb(37, 163, 84),
+      "info": #fff
+    ),
+    "danger": (
+      "base": rgb(252, 12, 3)
+    ),
+    "error": (
+      "base": rgb(252, 12, 3)
+    ),
+    "warning": (
+      "base": rgb(252, 200, 3)
+    ),
+    "info": (
+      "base": #fff
+    )
+  ),
+  $text-color: (
+    "regular": #fff,
+    "placeholder": rgba(255, 255, 255, 0.5),
+    "primary": #fff,
+    "secondary": #fff
+  ),
+  $bg-color: (
+    "": rgb(59, 61, 76),
+    "page": rgb(226, 230, 235),
+    "overlay": rgb(59, 61, 76),
+    "light": rgb(59, 61, 76)
+  ),
+  $border-color: (
+    "": #fff,
+    "light": rgba(255, 255, 255, 0.5),
+    "extra-light": rgba(65, 180, 207, 0.25)
+  ),
+  $table: (
+    "current-row-bg-color": rgb(42, 42, 52),
+    "row-hover-bg-color": rgb(42, 42, 52)
+  ),
+  $fill-color: (
+    "blank": rgb(59, 61, 76),
+    "light": rgb(42, 42, 52),
+    "": rgba(65, 180, 207, 0.25)
+  ),
+  $mask-color: (
+    "": rgba(255, 255, 255, 0.2)
+  )
+);
+@use "element-plus/theme-chalk/src/index.scss" as *;
+// @forward "vxe-table/styles/variable.scss" with (
+//   $vxe-ui-font-color: #fff,
+//   $vxe-ui-font-primary-color: #ff0000
+// );
+// @use "vxe-table/styles/all.scss";

@@ -1,0 +1,17 @@
+<svg width="88.000000" height="88.000000" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<linearGradient x1="44.000000" y1="0.000000" x2="44.000000" y2="88.000000" id="paint_linear_371_52500_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#C1C4D6"/>
+			<stop offset="1.000000" stop-color="#E9EAF0"/>
+		</linearGradient>
+	</defs>
+	<path id="Ellipse 653" d="M88 44C88 68.3 68.3 88 44 88C19.69 88 0 68.3 0 44C0 19.69 19.69 0 44 0C68.3 0 88 19.69 88 44Z" fill="url(#paint_linear_371_52500_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="Subtraction 1" d="M70.4 88L17.6 88L17.6 31.09C20.08 31.09 22.47 30.1 24.23 28.34C25.99 26.58 26.98 24.19 26.98 21.7L61.01 21.7C61.01 22.93 61.25 24.16 61.72 25.29C62.19 26.43 62.89 27.47 63.76 28.34C64.63 29.21 65.66 29.9 66.8 30.38C67.94 30.85 69.16 31.09 70.4 31.09L70.4 88Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="Ellipse 665" d="M58.07 45.76C58.07 53.53 51.77 59.84 44 59.84C36.22 59.84 29.91 53.53 29.91 45.76C29.91 37.98 36.22 31.68 44 31.68C51.77 31.68 58.07 37.98 58.07 45.76Z" fill="#81838B" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="Path 25936" d="M48.97 52.39L44 47.41L39.02 52.39L37.36 50.73L42.34 45.76L37.36 40.78L39.02 39.12L44 44.1L48.97 39.12L50.63 40.78L45.65 45.76L50.63 50.73L48.97 52.39Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="Rectangle 5617" d="M36.37 63.36L51.62 63.36C52.59 63.36 53.38 64.14 53.38 65.12C53.38 66.09 52.59 66.87 51.62 66.87L36.37 66.87C35.4 66.87 34.61 66.09 34.61 65.12C34.61 64.14 35.4 63.36 36.37 63.36Z" fill="#D9DAE5" fill-opacity="1.000000" fill-rule="evenodd"/>
+	<path id="Rectangle 5618" d="M31.09 70.4L56.9 70.4C57.87 70.4 58.66 71.18 58.66 72.16C58.66 73.13 57.87 73.92 56.9 73.92L31.09 73.92C30.12 73.92 29.33 73.13 29.33 72.16C29.33 71.18 30.12 70.4 31.09 70.4Z" fill="#D9DAE5" fill-opacity="1.000000" fill-rule="evenodd"/>
+</svg>
