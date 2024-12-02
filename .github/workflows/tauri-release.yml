@@ -19,6 +19,11 @@ jobs:
       releaseId: ${{ steps.tauri.outputs.releaseHtmlUrl }}
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
       - name: setup node
         uses: actions/setup-node@v3
         with:
