@@ -22,22 +22,12 @@ jobs:
         with:
           version: 9
           run_install: false
-      - name: Check file structure
-        run: |
-          echo "Current working directory:"
-          pwd
-          echo "Listing files in the repository:"
-          ls -R
       - name: setup node
         uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
-      - name: Copy config files to build directory
-        run: |
-          mkdir -p src-tauri/target/release/config
-          cp -r src-tauri/config/* src-tauri/target/release/config/
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
@@ -46,8 +36,6 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
       - name: install frontend dependencies
         run: pnpm install # change this to npm or pnpm depending on which one you use
-      - name: Check resource files
-        run: ls -R src-tauri/config
       - uses: tauri-apps/tauri-action@v0
         id: tauri
         env:
