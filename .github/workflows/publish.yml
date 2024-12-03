@@ -28,6 +28,11 @@ jobs:
           node-version: 18
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
+      - name: Copy config files to build directory
+        run: |
+          mkdir -p src-tauri/target/release/config
+          cp -r src-tauri/config/* src-tauri/target/release/config/
+
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
