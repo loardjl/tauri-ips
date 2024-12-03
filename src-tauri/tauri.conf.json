@@ -14,7 +14,7 @@
     "allowlist": {
       "all": true,
       "fs": {
-        "scope": ["**"]
+        "scope": ["**", "$RESOURCE/**"]
       },
       "http": {
         "all": true,
