@@ -4,12 +4,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: pguyot/arm-runner-action@v2.5.2
+      - uses: pguyot/arm-runner-action@v2.6.5
         with:
-          base_image: https://dietpi.com/downloads/images/DietPi_RPi-ARMv8-Bullseye.img.xz
+          base_image: https://dietpi.com/downloads/images/DietPi_RPi-ARMv8-Bookworm.img.xz
           cpu: cortex-a53
           bind_mount_repository: true
           image_additional_mb: 10240
@@ -37,8 +37,24 @@ jobs:
             pnpm install
             # Build the application
             pnpm tauri build
+      - name: Get app version
+        run: echo "APP_VERSION=$(jq -r .version src-tauri/tauri.conf.json)" >> $GITHUB_ENV
+
+      - name: Get app name
+        run: echo "APP_NAME=$(jq -r .productName src-tauri/tauri.conf.json)" >> $GITHUB_ENV
       - name: Upload deb bundle
         uses: actions/upload-artifact@v3
         with:
           name: Debian Bundle
-          path: ${{ github.workspace }}/target/release/bundle/deb/Arm Ips_0.1.1_arm64.deb
+          path: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/${{ env.APP_NAME }}_${{ env.APP_VERSION }}_arm64.deb
+      - name: Upload rpm bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: RPM Bundle
+          path: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-1.aarch64.rpm
+
+      - name: Upload appimage bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: AppImage Bundle
+          path: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/${{ env.APP_NAME }}_${{ env.APP_VERSION }}_aarch64.AppImage
