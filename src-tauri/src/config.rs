@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use std::fs;
-use std::path::PathBuf;
-// use std::path::{Path, PathBuf};
+// use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 //配置文件结构体
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -114,12 +114,12 @@ pub struct IntervalObj {
 // }
 //读取配置文件
 pub fn read_config() -> Result<AppConfig, Box<dyn std::error::Error>> {
-    // let config_path = Path::new("config/config.yml");
+    let config_path = Path::new("config/config.yml");
     // // 打印 config_path
     //
 
-    let mut config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    config_path.push("config/config.yml");
+    // let mut config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    // config_path.push("config/config.yml");
     println!("Config path: {:?}", config_path);
     let config_content = fs::read_to_string(config_path)?;
     let config: AppConfig = serde_yaml::from_str(&config_content)?;
