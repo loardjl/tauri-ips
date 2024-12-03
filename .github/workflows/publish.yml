@@ -31,7 +31,7 @@ jobs:
       - name: Copy config files for Linux and macOS
         if: matrix.platform != 'windows-latest'
         run: |
-          cp -r config/* ./src-tauri/target/debug/
+          cp -r ./src-tauri/config/* ./src-tauri/target/debug/
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
