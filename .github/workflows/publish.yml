@@ -28,6 +28,10 @@ jobs:
           node-version: 18
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
+      - name: Copy config files for Linux and macOS
+        if: matrix.platform != 'windows-latest'
+        run: |
+          cp -r config/* ./src-tauri/target/debug/
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
         run: |
@@ -37,8 +41,6 @@ jobs:
         run: pnpm install # change this to npm or pnpm depending on which one you use
       - name: Check resource files
         run: ls -R config
-      - name: Build application
-        run: cargo tauri build --verbose
       - uses: tauri-apps/tauri-action@v0
         id: tauri
         env:
