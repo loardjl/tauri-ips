@@ -36,7 +36,7 @@ jobs:
             # Install frontend dependencies
             pnpm install
             # Build the application
-            cargo tauri build
+            pnpm tauri build
       - name: Upload deb bundle
         uses: actions/upload-artifact@v3
         with:
