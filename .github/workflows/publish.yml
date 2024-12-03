@@ -22,6 +22,12 @@ jobs:
         with:
           version: 9
           run_install: false
+      - name: Check file structure
+        run: |
+          echo "Current working directory:"
+          pwd
+          echo "Listing files in the repository:"
+          ls -R
       - name: setup node
         uses: actions/setup-node@v3
         with:
