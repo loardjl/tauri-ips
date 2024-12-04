@@ -36,7 +36,7 @@ jobs:
             # Install frontend dependencies
             pnpm install
             # Build the application
-            pnpm tauri build
+            pnpm tauri build --verbose
       - name: Get app version
         run: echo "APP_VERSION=$(jq -r .version src-tauri/tauri.conf.json)" >> $GITHUB_ENV
 
