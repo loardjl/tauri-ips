@@ -261,6 +261,12 @@ const workpieceStrategy = async () => {
     data.result.strategies.forEach(item => {
       item.optimize_ctrl_learn_factor = item.optimize_ctrl_learn_factor.toFixed(1)
       item.overload_protection_learn_factor = item.overload_protection_learn_factor.toFixed(1)
+      item.overload_protection_feed_rate = item.overload_protection_feed_rate * 100
+      item.optimize_ctrl_feed_rate = item.optimize_ctrl_feed_rate * 100
+      item.optimize_ctrl_max_feed_rate = item.optimize_ctrl_max_feed_rate * 100
+      item.optimize_ctrl_min_feed_rate = item.optimize_ctrl_min_feed_rate * 100
+      item.touch_feed_rate = item.touch_feed_rate * 100
+      item.touch_protection_rate = item.touch_protection_rate * 100
     })
     strategiesid.value = data.result.strategies[0].strategy_id
     strategies.value = data.result.strategies
@@ -273,6 +279,15 @@ const workpieceStrategy = async () => {
 
 const popoverRef = ref(null)
 const setStrategyFun = async () => {
+  strategiesItem.value.overload_protection_feed_rate =
+    strategiesItem.value.overload_protection_feed_rate / 100
+  strategiesItem.value.optimize_ctrl_feed_rate = strategiesItem.value.optimize_ctrl_feed_rate / 100
+  strategiesItem.value.optimize_ctrl_max_feed_rate =
+    strategiesItem.value.optimize_ctrl_max_feed_rate / 100
+  strategiesItem.value.optimize_ctrl_min_feed_rate =
+    strategiesItem.value.optimize_ctrl_min_feed_rate / 100
+  strategiesItem.value.touch_feed_rate = strategiesItem.value.touch_feed_rate / 100
+  strategiesItem.value.touch_protection_rate = strategiesItem.value.touch_protection_rate / 100
   try {
     const res = await fetchPostApi(
       {

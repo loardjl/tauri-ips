@@ -60,9 +60,7 @@
         <div class="text-btn">
           <div>
             <span>今日提效</span>
-            <span>{{
-              _public.getTime(optimizeInfo.dayly_optimize_time, '{d} d {h} h {m} m')
-            }}</span>
+            <span>{{ _public.getTime(optimizeInfo.dayly_optimize_time, '{h} h {m} m') }}</span>
           </div>
           <div>
             <span>最近一周提效</span>
@@ -90,8 +88,8 @@
         <div class="magnification">
           <div><span>进给控制倍率</span> / <span>进给旋钮倍率</span></div>
           <div>
-            <span>{{ realtimeInfo.strategy_feedback }}%</span>&ensp;/
-            <span>{{ realtimeInfo.nc_knob_feedback }}%</span>
+            <span>{{ realtimeInfo.strategy_feedback * 100 }}%</span>&ensp;/
+            <span>{{ realtimeInfo.nc_knob_feedback * 100 }}%</span>
           </div>
         </div>
       </div>
