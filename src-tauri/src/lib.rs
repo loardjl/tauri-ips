@@ -6,6 +6,7 @@ mod nc_signal;
 mod tcp_client;
 
 use api_server::start_server;
+use msg_type::ProtocolHeader;
 use reqwest::header::{self, HeaderMap};
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -67,10 +68,20 @@ pub async fn run() {
     let client_config_clone = client_config.clone();
 
     tokio::spawn(async move {
+        let hearbeat = ProtocolHeader {
+            header: 0x90eb,
+            version: 0x01,
+            order1: 0x0000,
+            order2: 0x0200,
+            state: 0x01,
+            reset: 0x00000000,
+            vor: 0x00,
+            len: 0x0000,
+        };
         if let Err(e) = manager_clone
             .lock()
             .await
-            .add_client("dc".to_string(), client_config_clone)
+            .add_client("dc".to_string(), client_config_clone, hearbeat)
             .await
         {
             eprintln!("Failed to connect dc TCP client: {}", e);
@@ -83,10 +94,20 @@ pub async fn run() {
     let client_config_ips = dc_client_config.clone();
 
     tokio::spawn(async move {
+        let hearbeat = ProtocolHeader {
+            header: 0x90eb,
+            version: 0x01,
+            order1: 0x1600,
+            order2: 0x0200,
+            state: 0x01,
+            reset: 0x00000000,
+            vor: 0x00,
+            len: 0x0000,
+        };
         if let Err(e) = manager_clone_ips
             .lock()
             .await
-            .add_client("ips".to_string(), client_config_ips)
+            .add_client("ips".to_string(), client_config_ips, hearbeat)
             .await
         {
             eprintln!("Failed to connect ips TCP client: {}", e);

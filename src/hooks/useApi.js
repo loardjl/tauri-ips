@@ -19,9 +19,9 @@ export const useApi = () => {
     try {
       const res = await invoke('send_http_post_msg', {
         url: url ?? URL + '/' + type,
-        data: JSON.stringify(data)
+        data
       })
-      return res
+      return JSON.parse(res)
     } catch (error) {
       return Promise.reject(error)
     }

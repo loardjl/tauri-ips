@@ -24,6 +24,7 @@ pub struct TcpClient {
     receiver: Arc<Mutex<Receiver<Vec<u8>>>>,
     writer: Option<Arc<Mutex<OwnedWriteHalf>>>, // 存储可写流
     status: Arc<Mutex<i32>>,                    // 连接状态，1 为连接成功，0 为断开
+    heartbeat: ProtocolHeader,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,7 +37,10 @@ struct SliceData {
 
 impl TcpClient {
     /// 创建新的 TCP 客户端
-    pub async fn new(config: TcpConfig) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn new(
+        config: TcpConfig,
+        heartbeat: ProtocolHeader,
+    ) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let address = format!("{}:{}", config.host, config.port);
         let (tx, rx) = mpsc::channel(100);
         let mut client = TcpClient {
@@ -45,6 +49,7 @@ impl TcpClient {
             receiver: Arc::new(Mutex::new(rx)),
             writer: None,
             status: Arc::new(Mutex::new(0)), // 默认断开
+            heartbeat,
         };
 
         // 尝试启动监听
@@ -193,7 +198,7 @@ impl TcpClient {
                 }
             }
         });
-
+        let hearbeat = self.heartbeat.clone();
         // 心跳任务
         if let Some(writer) = &self.writer {
             let writer_clone = Arc::clone(writer);
@@ -202,16 +207,7 @@ impl TcpClient {
                 loop {
                     interval.tick().await;
                     let mut writer = writer_clone.lock().await;
-                    let hearbeat = ProtocolHeader {
-                        header: 0x90eb,
-                        version: 0x01,
-                        order1: 0x1600,
-                        order2: 0x0200,
-                        state: 0x01,
-                        reset: 0x00000000,
-                        vor: 0x00,
-                        len: 0x0000,
-                    };
+
                     let hearbeat_bytes = bytemuck::bytes_of(&hearbeat);
                     // eprintln!("hearbeat_bytes: {:?}", hearbeat_bytes);
                     if let Err(e) = writer.write_all(&hearbeat_bytes).await {
@@ -423,8 +419,9 @@ impl TcpClientManager {
         &mut self,
         topic: String,
         config: TcpConfig,
+        heartbeat: ProtocolHeader,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let client = TcpClient::new(config).await?;
+        let client = TcpClient::new(config, heartbeat).await?;
         self.clients.insert(topic, Arc::new(Mutex::new(client)));
         Ok(())
     }
