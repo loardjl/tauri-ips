@@ -19,10 +19,10 @@ cloud:
 
 ips:
   tcp:
-    host: 172.16.10.36
+    host: 172.16.10.237
     port: 9142
   http:
-    host: 192.168.10.151
+    host: 172.16.10.237
     port: 9998
 
 local:

@@ -30,6 +30,7 @@ async fn send_http_post_msg(url: String, data: Value) -> Result<String, ()> {
         .send()
         .await
         .unwrap();
+    println!("res: {:?}", res);
     let body = res.text().await.unwrap();
     Ok(body)
 }
