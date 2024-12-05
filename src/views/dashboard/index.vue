@@ -88,8 +88,8 @@
         <div class="magnification">
           <div><span>进给控制倍率</span> / <span>进给旋钮倍率</span></div>
           <div>
-            <span>{{ realtimeInfo.strategy_feedback * 100 }}%</span>&ensp;/
-            <span>{{ realtimeInfo.nc_knob_feedback * 100 }}%</span>
+            <span>{{ realtimeInfo.strategy_feedback }}%</span>&ensp;/
+            <span>{{ realtimeInfo.nc_knob_feedback }}%</span>
           </div>
         </div>
       </div>
@@ -156,12 +156,16 @@ onMounted(() => {
   init()
   worker.send('IpsRegister', {})
   worker.dispatch('RealTimeData', ({ payload }) => {
+    payload.Ok.strategy_feedback = (payload.Ok.strategy_feedback * 100).toFixed(0)
+    payload.Ok.nc_knob_feedback = (payload.Ok.nc_knob_feedback * 100).toFixed(0)
     realtimeInfo.value = payload.Ok
+    init()
     console.log('RealTimeData', payload)
   })
   getstrategFun()
   worker.dispatch('OptimizeInfo', ({ payload }) => {
     console.log('OptimizeInfo', payload)
+    payload.Ok.total_processing_time = payload.Ok.total_processing_time / 1000
     optimizeInfo.value = payload.Ok
   })
 })
@@ -170,7 +174,7 @@ const optimizeInfo = ref({
   strategy_status: -1,
   total_optimize_time: '',
   total_processing_time: '',
-  total_processing_count: '1',
+  total_processing_count: '0',
   dayly_optimize_time: 0,
   weekly_optimize_time: '',
   monthly_optimize_time: ''
@@ -255,98 +259,105 @@ let myChart = null
 const init = () => {
   const dom = document.getElementById('chart')
   if (!dom) return
-  myChart = echarts.init(dom)
-  const option = {
-    series: [
-      {
-        type: 'gauge',
-        center: ['50%', '60%'],
-        radius: '110%',
-        startAngle: 180,
-        endAngle: -0,
-        min: 0,
-        max: 200,
-        itemStyle: {
-          color: '#42B4D2'
+  let option = null
+  if (!myChart) {
+    myChart = echarts.init(dom)
+    option = {
+      series: [
+        {
+          type: 'gauge',
+          center: ['50%', '60%'],
+          radius: '110%',
+          startAngle: 180,
+          endAngle: -0,
+          min: 0,
+          max: 200,
+          itemStyle: {
+            color: '#42B4D2'
+          },
+          progress: {
+            show: true,
+            width: 15,
+            roundCap: true, // 是否圆顶
+            itemStyle: {}
+          },
+          pointer: {
+            show: false
+          },
+          axisLine: {
+            roundCap: true,
+            lineStyle: {
+              color: [[1, '#4A3AFF1A']],
+              width: 15
+            }
+          },
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            show: false
+          },
+          axisLabel: {
+            show: false
+          },
+          detail: {
+            show: false
+          },
+          data: [
+            {
+              value: realtimeInfo.value.strategy_feedback
+            }
+          ]
         },
-        progress: {
-          show: true,
-          width: 15,
-          roundCap: true, // 是否圆顶
-          itemStyle: {}
-        },
-        pointer: {
-          show: false
-        },
-        axisLine: {
-          roundCap: true,
-          lineStyle: {
-            color: [[1, '#4A3AFF1A']],
-            width: 15
-          }
-        },
-        axisTick: {
-          show: false
-        },
-        splitLine: {
-          show: false
-        },
-        axisLabel: {
-          show: false
-        },
-        detail: {
-          show: false
-        },
-        data: [
-          {
-            value: realtimeInfo.value.strategy_feedback
-          }
-        ]
-      },
-      {
-        type: 'gauge',
-        center: ['50%', '60%'],
-        radius: '70%',
-        startAngle: 180,
-        endAngle: -0,
-        min: 0,
-        max: 200,
-        itemStyle: {
-          color: '#A5A5A5'
-        },
-        progress: {
-          roundCap: true,
-          show: true,
-          width: 10
-        },
-        pointer: {
-          show: false
-        },
-        axisLine: {
-          roundCap: true,
-          lineStyle: {
-            color: [[1, '#D6D6D6']]
-          }
-        },
-        axisTick: {
-          show: false
-        },
-        splitLine: {
-          show: false
-        },
-        axisLabel: {
-          show: false
-        },
-        detail: {
-          show: false
-        },
-        data: [
-          {
-            value: realtimeInfo.value.nc_knob_feedback
-          }
-        ]
-      }
-    ]
+        {
+          type: 'gauge',
+          center: ['50%', '60%'],
+          radius: '70%',
+          startAngle: 180,
+          endAngle: -0,
+          min: 0,
+          max: 200,
+          itemStyle: {
+            color: '#A5A5A5'
+          },
+          progress: {
+            roundCap: true,
+            show: true,
+            width: 10
+          },
+          pointer: {
+            show: false
+          },
+          axisLine: {
+            roundCap: true,
+            lineStyle: {
+              color: [[1, '#D6D6D6']]
+            }
+          },
+          axisTick: {
+            show: false
+          },
+          splitLine: {
+            show: false
+          },
+          axisLabel: {
+            show: false
+          },
+          detail: {
+            show: false
+          },
+          data: [
+            {
+              value: realtimeInfo.value.nc_knob_feedback
+            }
+          ]
+        }
+      ]
+    }
+  } else {
+    option = myChart.getOption()
+    option.series[0].data[0].value = realtimeInfo.value.strategy_feedback
+    option.series[1].data[0].value = realtimeInfo.value.nc_knob_feedback
   }
 
   myChart.setOption(option)
