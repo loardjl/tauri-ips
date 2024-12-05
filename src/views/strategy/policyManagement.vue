@@ -258,15 +258,17 @@ const workpieceStrategy = async () => {
       'ipsbatch'
     )
     const data = res
+
     data.result.strategies.forEach(item => {
       item.optimize_ctrl_learn_factor = item.optimize_ctrl_learn_factor.toFixed(1)
       item.overload_protection_learn_factor = item.overload_protection_learn_factor.toFixed(1)
-      item.overload_protection_feed_rate = item.overload_protection_feed_rate * 100
-      item.optimize_ctrl_feed_rate = item.optimize_ctrl_feed_rate * 100
-      item.optimize_ctrl_max_feed_rate = item.optimize_ctrl_max_feed_rate * 100
-      item.optimize_ctrl_min_feed_rate = item.optimize_ctrl_min_feed_rate * 100
-      item.touch_feed_rate = item.touch_feed_rate * 100
-      item.touch_protection_rate = item.touch_protection_rate * 100
+      item.overload_protection_feed_rate = (item.overload_protection_feed_rate * 100).toFixed(0)
+      item.optimize_ctrl_feed_rate = (item.optimize_ctrl_feed_rate * 100).toFixed(0)
+      item.optimize_ctrl_max_feed_rate = (item.optimize_ctrl_max_feed_rate * 100).toFixed(0)
+      item.optimize_ctrl_min_feed_rate = (item.optimize_ctrl_min_feed_rate * 100).toFixed(0)
+      item.touch_feed_rate = (item.touch_feed_rate * 100).toFixed(0)
+      item.touch_protection_rate = (item.touch_protection_rate * 100).toFixed(0)
+      item.touch_entry_protection_time = item.touch_entry_protection_time.toFixed(0)
     })
     strategiesid.value = data.result.strategies[0].strategy_id
     strategies.value = data.result.strategies

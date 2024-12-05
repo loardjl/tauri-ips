@@ -29,7 +29,7 @@ pub struct SignalValue {
     pub sig_id: u32,
     pub sig_type: u32,
     pub sig_freq_type: u32,
-    pub sig_data_type: u8,
+    pub sig_data_type: u32,
     pub nums: u32,
     pub buffer_len: u32,
     pub val: Vec<u8>,
@@ -39,7 +39,7 @@ pub struct ResultSignalValue {
     pub sig_id: u32,
     pub sig_type: u32,
     pub sig_freq_type: u32,
-    pub sig_data_type: u8,
+    pub sig_data_type: u32,
     pub nums: u32,
     pub buffer_len: u32,
     pub val: Vec<u8>,
@@ -79,11 +79,8 @@ impl NcSignalVal {
         }
     }
 }
-
+#[derive(Debug, Serialize, Deserialize)]
 pub struct NcSignal {
-    pub slice_count: u16,
-    pub slice_id: u16,
-    pub slice_size: u16,
     pub dev_id: u32,
     pub timestamp: u64,
     pub collector_id: u32,
@@ -95,9 +92,6 @@ impl NcSignal {
     pub fn parse_nc_signal(data: &[u8]) -> Result<NcSignal, &'static str> {
         let mut offset = 0;
 
-        let slice_count = read_u16(data, &mut offset)?;
-        let slice_id = read_u16(data, &mut offset)?;
-        let slice_size = read_u16(data, &mut offset)?;
         let dev_id = read_u32(data, &mut offset)?;
         let timestamp = read_u64(data, &mut offset)?;
         let collector_id = read_u32(data, &mut offset)?;
@@ -108,7 +102,7 @@ impl NcSignal {
             let sig_id = read_u32(data, &mut offset)?;
             let sig_type = read_u32(data, &mut offset)?;
             let sig_freq_type = read_u32(data, &mut offset)?;
-            let sig_data_type = read_u8(data, &mut offset)?;
+            let sig_data_type = read_u32(data, &mut offset)?;
             let nums = read_u32(data, &mut offset)?;
             let buffer_len = read_u32(data, &mut offset)?;
             let val = read_bytes(data, &mut offset, buffer_len as usize)?;
@@ -125,9 +119,6 @@ impl NcSignal {
         }
 
         Ok(NcSignal {
-            slice_count,
-            slice_id,
-            slice_size,
             dev_id,
             timestamp,
             collector_id,

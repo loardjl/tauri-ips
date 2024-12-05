@@ -9,17 +9,17 @@
             <span
               class="text-optimize"
               :class="[
-                optimizeInfo.strategy_status === 1
+                realtimeInfo.strategy_status === 1
                   ? 'greens'
-                  : optimizeInfo.strategy_status === 2
+                  : realtimeInfo.strategy_status === 2
                   ? 'yellow'
                   : 'grey'
               ]"
               >{{
-                optimizeInfo.strategy_status === 1
+                realtimeInfo.strategy_status === 1
                   ? '效率优先'
-                  : optimizeInfo.strategy_status === 2
-                  ? '过程等待'
+                  : realtimeInfo.strategy_status === 2
+                  ? '过程关闭'
                   : '优化关闭'
               }}</span
             >
@@ -27,19 +27,19 @@
           <div class="text-num">
             <div>
               <span class="text-timnum">{{
-                parseInt(optimizeInfo.total_optimize_time / 60 / 60 / 24)
+                parseInt(optimizeInfo.total_optimize_time / 1000 / 60 / 60 / 24)
               }}</span>
               <span class="text-timlogotype">d</span>
             </div>
             <div>
               <span class="text-timnum">{{
-                parseInt((optimizeInfo.total_optimize_time / 60 / 60) % 24)
+                parseInt((optimizeInfo.total_optimize_time / 1000 / 60 / 60) % 24)
               }}</span>
               <span class="text-timlogotype">h</span>
             </div>
             <div>
               <span class="text-timnum">{{
-                parseInt((optimizeInfo.total_optimize_time / 60) % 60)
+                parseInt((optimizeInfo.total_optimize_time / 1000 / 60) % 60)
               }}</span>
               <span class="text-timlogotype">min</span>
             </div>
@@ -165,13 +165,11 @@ onMounted(() => {
   getstrategFun()
   worker.dispatch('OptimizeInfo', ({ payload }) => {
     console.log('OptimizeInfo', payload)
-    payload.Ok.total_processing_time = payload.Ok.total_processing_time / 1000
     optimizeInfo.value = payload.Ok
   })
 })
 //提效数据
 const optimizeInfo = ref({
-  strategy_status: -1,
   total_optimize_time: '',
   total_processing_time: '',
   total_processing_count: '0',
@@ -181,6 +179,7 @@ const optimizeInfo = ref({
 })
 //加工信息
 const realtimeInfo = ref({
+  strategy_status: -1,
   workpiece_id: '',
   program_number: '',
   tool_number: '',

@@ -30,7 +30,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const inputValue = computed({
-  get: () => Number(props.modelValue),
+  get: () => Number(props.modelValue) || 0,
   set: val => {
     padNumber(inputValue.value)
     emit('update:modelValue', Number(val))

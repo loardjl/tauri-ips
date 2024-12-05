@@ -143,7 +143,6 @@ impl TcpClient {
                     Ok(n) => {
                         // 合并上次残留数据和本次读取的数据
                         leftover.extend_from_slice(&buffer[..n]);
-                        println!("leftover----------: {:?}", leftover);
 
                         // 循环解析有效数据包
                         while leftover.len() >= 15 {
@@ -296,7 +295,6 @@ async fn process_data_segment(
                 .unwrap();
             let slice_val = &data_bytes[6..];
             slice_data.val = slice_val.to_vec();
-            println!("slice_data: {:?}", slice_data);
 
             // 初始化分片处理器
             if fragmentation_handler.is_none() {
@@ -372,10 +370,6 @@ impl FragmentationHandler {
 
     // 合并数据，如果所有分片都到达，则返回合并后的数据
     fn try_to_merge(&mut self) -> Option<Vec<u8>> {
-        println!(
-            "current_count: {:?}, total_count: {:?}",
-            self.current_count, self.total_count
-        );
         if self.current_count == self.total_count {
             // 合并所有分片
             let mut merged_data = Vec::new();
@@ -404,7 +398,6 @@ async fn handle_fragmented_data(
 
     // 如果分片合并完成，则发送数据
     if let Some(merged_data) = handler.try_to_merge() {
-        println!("All fragments received. Merged data: {:?}", merged_data);
         let send_data = SendData {
             data: merged_data,
             is_json,

@@ -52,7 +52,7 @@ const getDcStatus = () => {
   // 数据中心服务连接状态推送
   worker.send('getToken', {})
   worker.dispatch('GetToken', async ({ payload }) => {
-    sessionStorage.setItem('token', payload.ok.token)
+    sessionStorage.setItem('token', payload.Ok.token)
     try {
       const res = await fetchPostApi({
         version: '1.0',

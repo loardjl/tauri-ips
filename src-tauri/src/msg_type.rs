@@ -58,7 +58,7 @@ pub fn get_process_mode(order1: u16, order2: u16) -> ProcessingMode {
     mode_map.insert((0x8013, 0x0009), ProcessingMode::FragmentedJson);
     mode_map.insert((0x0016, 0x0102), ProcessingMode::Fragmented);
     mode_map.insert((0x0016, 0x0103), ProcessingMode::Fragmented);
-    mode_map.insert((0x0000, 0x0103), ProcessingMode::Direct);
+    mode_map.insert((0x0000, 0x0103), ProcessingMode::Fragmented);
     mode_map.insert((0x8000, 0x0101), ProcessingMode::Fragmented);
 
     mode_map
@@ -77,6 +77,7 @@ pub struct RealTimeData {
     pub actual_feedback: f64,   // 实际进给
     pub strategy_feedback: f64, // 策略中输出的进给控制倍率
     pub nc_knob_feedback: f64,  // NC采到的进给旋钮倍率
+    pub strategy_status: u32, //当前策略状态：0-绿色的 效率优化 1-黄色的 过程等待 2-灰色的 优化关闭
 }
 impl RealTimeData {
     // 解析 RealTimeData
@@ -94,6 +95,7 @@ impl RealTimeData {
         let actual_feedback = read_f64(data, &mut offset)?;
         let strategy_feedback = read_f64(data, &mut offset)?;
         let nc_knob_feedback = read_f64(data, &mut offset)?;
+        let strategy_status = read_u32(data, &mut offset)?;
 
         Ok(RealTimeData {
             workpiece_id,
@@ -103,26 +105,25 @@ impl RealTimeData {
             actual_feedback,
             strategy_feedback,
             nc_knob_feedback,
+            strategy_status,
         })
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct OptimizeInfo {
-    pub strategy_status: u32, //当前策略状态：0-绿色的 效率优化 1-黄色的 过程等待 2-灰色的 优化关闭
-    pub total_optimize_time: u32, //总提效时间
-    pub total_processing_time: u32, //总加工时间
+    pub total_optimize_time: u32,    //总提效时间
+    pub total_processing_time: u32,  //总加工时间
     pub total_processing_count: u32, //总加工件数
-    pub dayly_optimize_time: u32, //当日提效时间
-    pub weekly_optimize_time: u32, //最近一周提效时间
-    pub monthly_optimize_time: u32, //最近一个月提效时间
+    pub dayly_optimize_time: u32,    //当日提效时间
+    pub weekly_optimize_time: u32,   //最近一周提效时间
+    pub monthly_optimize_time: u32,  //最近一个月提效时间
 }
 
 impl OptimizeInfo {
     pub fn to_string(data: &[u8]) -> Result<OptimizeInfo, &'static str> {
         let mut offset = 0;
 
-        let strategy_status = read_u32(data, &mut offset)?;
         let total_optimize_time = read_u32(data, &mut offset)?;
         let total_processing_time = read_u32(data, &mut offset)?;
         let total_processing_count = read_u32(data, &mut offset)?;
@@ -131,7 +132,6 @@ impl OptimizeInfo {
         let monthly_optimize_time = read_u32(data, &mut offset)?;
 
         Ok(OptimizeInfo {
-            strategy_status,
             total_optimize_time,
             total_processing_time,
             total_processing_count,

@@ -242,6 +242,7 @@ export const _public = {
   },
   //秒转 秒 小时 分钟 天
   getTime(time, format) {
+    time = time / 1000
     const d = parseInt(time / 60 / 60 / 24)
     const h = parseInt((time / 60 / 60) % 24)
     const m = parseInt((time / 60) % 60)

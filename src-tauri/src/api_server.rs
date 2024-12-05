@@ -172,7 +172,6 @@ async fn handle_connec(
 }
 
 async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value, String> {
-    println!("Decoding data: {:?}", data);
     println!("Decoding msg: {:?}", msg);
     match msg {
         MsgType::RealTimeData => {
@@ -198,19 +197,19 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
             }
         }
         MsgType::NcSignalVal => {
-            let signal_value = NcSignal::parse_nc_signal(data.as_slice()).unwrap();
+            let signal_value = NcSignal::parse_nc_signal(&data).unwrap();
             if topic == "dc" {
                 let nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
                 let signal_data = nc_signal_manager.realtime_data.get("dc").cloned();
                 drop(nc_signal_manager);
                 match signal_data {
                     Some(mut signal_data) => {
-                        println!("update signal_data: {:?}", signal_data);
                         set_nc_signal_val(&mut signal_data, signal_value);
                         let mut nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
                         nc_signal_manager
                             .realtime_data
                             .insert("dc".to_string(), signal_data);
+                        println!("update signal_data: {:?}", nc_signal_manager.realtime_data);
                     }
                     None => {
                         let nc_signal_val =
