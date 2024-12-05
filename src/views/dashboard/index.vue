@@ -157,7 +157,7 @@ onMounted(() => {
   worker.send('IpsRegister', {})
   worker.send('getToken', {})
   worker.dispatch('GetToken', ({ payload }) => {
-    console.log('GetToken', payload)
+    sessionStorage.setItem('token', payload.Ok.token)
   })
   worker.dispatch('RealTimeData', ({ payload }) => {
     realtimeInfo.value = payload.Ok

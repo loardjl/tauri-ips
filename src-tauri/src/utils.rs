@@ -25,6 +25,10 @@ pub fn read_u32(data: &[u8], offset: &mut usize) -> Result<u32, &'static str> {
     let bytes = read_bytes(data, offset, 4)?;
     Ok(u32::from_le_bytes(bytes.try_into().unwrap()))
 }
+pub fn read_i32(data: &[u8], offset: &mut usize) -> Result<i32, &'static str> {
+    let bytes = read_bytes(data, offset, 4)?;
+    Ok(i32::from_le_bytes(bytes.try_into().unwrap()))
+}
 pub fn read_u64(data: &[u8], offset: &mut usize) -> Result<u64, &'static str> {
     let bytes = read_bytes(data, offset, 8)?;
     Ok(u64::from_le_bytes(bytes.try_into().unwrap()))

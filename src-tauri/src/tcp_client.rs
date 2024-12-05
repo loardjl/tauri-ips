@@ -169,12 +169,12 @@ impl TcpClient {
                                 if leftover.len() < total_len {
                                     break; // 数据不足，等待更多数据
                                 }
-                                let hex_output: String = leftover
-                                    .iter()
-                                    .map(|byte| format!("{:02X}", byte))
-                                    .collect::<Vec<_>>()
-                                    .join(" ");
-                                println!("Received data: {:?}", hex_output);
+                                // let hex_output: String = leftover
+                                //     .iter()
+                                //     .map(|byte| format!("{:02X}", byte))
+                                //     .collect::<Vec<_>>()
+                                //     .join(" ");
+                                // println!("Received data: {:?}", hex_output);
 
                                 // 解析 order1 和 order2
                                 let order1 = u16::from_be_bytes([leftover[3], leftover[4]]);

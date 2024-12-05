@@ -1,4 +1,4 @@
-use crate::utils::{read_f64, read_string, read_u32};
+use crate::utils::{read_f64, read_i32, read_string, read_u32};
 use bytemuck::{Pod, Zeroable};
 use byteorder::{BigEndian, ReadBytesExt}; // 引入 byteorder
 use serde::{Deserialize, Serialize};
@@ -58,8 +58,8 @@ pub fn get_process_mode(order1: u16, order2: u16) -> ProcessingMode {
     mode_map.insert((0x8013, 0x0009), ProcessingMode::FragmentedJson);
     mode_map.insert((0x0016, 0x0102), ProcessingMode::Fragmented);
     mode_map.insert((0x0016, 0x0103), ProcessingMode::Fragmented);
-    mode_map.insert((0x8000, 0x0103), ProcessingMode::Direct);
-    mode_map.insert((0x8000, 0x0101), ProcessingMode::Direct);
+    mode_map.insert((0x0000, 0x0103), ProcessingMode::Direct);
+    mode_map.insert((0x8000, 0x0101), ProcessingMode::Fragmented);
 
     mode_map
         .get(&(order1, order2))
@@ -180,7 +180,7 @@ pub fn get_msg(order1: u16, order2: u16) -> MsgType {
     let mut mode_map = HashMap::new();
     mode_map.insert((0x0016, 0x0102), MsgType::RealTimeData);
     mode_map.insert((0x0016, 0x0103), MsgType::OptimizeInfo);
-    mode_map.insert((0x8000, 0x0103), MsgType::NcSignalVal);
+    mode_map.insert((0x0000, 0x0103), MsgType::NcSignalVal);
     mode_map.insert((0x8000, 0x0101), MsgType::GetToken);
     mode_map
         .get(&(order1, order2))

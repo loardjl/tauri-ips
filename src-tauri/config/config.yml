@@ -7,7 +7,7 @@ dc:
     pre_url: /datacenter
     decision_url: /decision
   tcp:
-    host: 172.16.10.75
+    host: 172.16.10.237
     port: 9135
 cloud:
   mcm:
