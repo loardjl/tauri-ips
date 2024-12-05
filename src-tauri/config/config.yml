@@ -1,13 +1,13 @@
 dc:
   http:
-    host: 172.16.10.75
+    host: 172.16.10.237
     port: 10010
     port_decision: 10010
     url: /datacenter
     pre_url: /datacenter
     decision_url: /decision
   tcp:
-    host: 172.16.10.20
+    host: 172.16.10.75
     port: 9135
 cloud:
   mcm:

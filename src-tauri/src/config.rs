@@ -115,9 +115,7 @@ pub struct IntervalObj {
 //读取配置文件
 pub fn read_config() -> Result<AppConfig, Box<dyn std::error::Error>> {
     let config_path = Path::new("config/config.yml");
-    // let resource_path = resource_dir();
     // // 打印 config_path
-    //
 
     // let mut config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     // config_path.push("config/config.yml");

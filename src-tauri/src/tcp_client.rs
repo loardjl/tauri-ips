@@ -1,6 +1,7 @@
 use crate::msg_type::{
     get_msg, get_process_mode, parse_protocol_header, MsgType, ProcessingMode, ProtocolHeader,
 };
+use crate::nc_signal::NcSignalManager;
 use bincode::Options;
 use futures_util::lock::Mutex;
 use serde::{Deserialize, Serialize};
@@ -25,6 +26,7 @@ pub struct TcpClient {
     writer: Option<Arc<Mutex<OwnedWriteHalf>>>, // 存储可写流
     status: Arc<Mutex<i32>>,                    // 连接状态，1 为连接成功，0 为断开
     heartbeat: ProtocolHeader,
+    topic: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,9 +42,10 @@ impl TcpClient {
     pub async fn new(
         config: TcpConfig,
         heartbeat: ProtocolHeader,
+        topic: String,
     ) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let address = format!("{}:{}", config.host, config.port);
-        let (tx, rx) = mpsc::channel(100);
+        let (tx, rx) = mpsc::channel(1000);
         let mut client = TcpClient {
             address,
             sender: Arc::new(Mutex::new(tx)),
@@ -50,6 +53,7 @@ impl TcpClient {
             writer: None,
             status: Arc::new(Mutex::new(0)), // 默认断开
             heartbeat,
+            topic,
         };
 
         // 尝试启动监听
@@ -82,11 +86,15 @@ impl TcpClient {
     pub async fn start_listening(
         &mut self,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        println!("topic: {:?}", self.topic);
         loop {
             match self.connect_and_listen().await {
                 Ok(_) => break, // 成功连接
                 Err(e) => {
-                    eprintln!("Failed to connect: {}. Retrying in 5 seconds...", e);
+                    eprintln!(
+                        "{} Failed to connect: {}. Retrying in 5 seconds...",
+                        self.topic, e
+                    );
                     time::sleep(Duration::from_secs(5)).await;
                 }
             }
@@ -110,6 +118,9 @@ impl TcpClient {
         // 连接成功，设置状态为 1
         let mut status_lock = self.status.lock().await;
         *status_lock = 1;
+        drop(status_lock);
+        let topic = self.topic.clone();
+        println!("connect_and_listen topic: {:?}", topic);
 
         // 消息接收任务
         let sender_clone = sender.clone();
@@ -132,6 +143,7 @@ impl TcpClient {
                     Ok(n) => {
                         // 合并上次残留数据和本次读取的数据
                         leftover.extend_from_slice(&buffer[..n]);
+                        println!("leftover----------: {:?}", leftover);
 
                         // 循环解析有效数据包
                         while leftover.len() >= 15 {
@@ -167,7 +179,10 @@ impl TcpClient {
                                 // 解析 order1 和 order2
                                 let order1 = u16::from_be_bytes([leftover[3], leftover[4]]);
                                 let order2 = u16::from_be_bytes([leftover[5], leftover[6]]);
-                                println!("order1: {:04X} order2: {:04X}", order1, order2);
+                                println!(
+                                    "order1: {:04X} order2: {:04X} topic: {}",
+                                    order1, order2, &topic
+                                );
                                 // 判断数据处理模式
                                 let processing_mode = get_process_mode(order1, order2);
                                 let msg = get_msg(order1, order2);
@@ -199,6 +214,7 @@ impl TcpClient {
             }
         });
         let hearbeat = self.heartbeat.clone();
+        let topic = self.topic.clone();
         // 心跳任务
         if let Some(writer) = &self.writer {
             let writer_clone = Arc::clone(writer);
@@ -209,7 +225,7 @@ impl TcpClient {
                     let mut writer = writer_clone.lock().await;
 
                     let hearbeat_bytes = bytemuck::bytes_of(&hearbeat);
-                    // eprintln!("hearbeat_bytes: {:?}", hearbeat_bytes);
+                    eprintln!("hearbeat_bytes: {:?}", &topic);
                     if let Err(e) = writer.write_all(&hearbeat_bytes).await {
                         eprintln!("Error sending heartbeat: {}", e);
                         break; // 连接断开，停止心跳任务
@@ -246,6 +262,9 @@ impl TcpClient {
     /// 获取接收器
     pub fn get_receiver(&self) -> Arc<Mutex<mpsc::Receiver<Vec<u8>>>> {
         Arc::clone(&self.receiver)
+    }
+    pub fn get_topic(&self) -> String {
+        self.topic.clone()
     }
 }
 
@@ -421,8 +440,9 @@ impl TcpClientManager {
         config: TcpConfig,
         heartbeat: ProtocolHeader,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let client = TcpClient::new(config, heartbeat).await?;
-        self.clients.insert(topic, Arc::new(Mutex::new(client)));
+        let client = TcpClient::new(config, heartbeat, topic.clone()).await?;
+        self.clients
+            .insert(topic.clone(), Arc::new(Mutex::new(client)));
         Ok(())
     }
 

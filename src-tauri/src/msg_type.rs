@@ -1,3 +1,4 @@
+use crate::utils::{read_f64, read_string, read_u32};
 use bytemuck::{Pod, Zeroable};
 use byteorder::{BigEndian, ReadBytesExt}; // 引入 byteorder
 use serde::{Deserialize, Serialize};
@@ -57,41 +58,13 @@ pub fn get_process_mode(order1: u16, order2: u16) -> ProcessingMode {
     mode_map.insert((0x8013, 0x0009), ProcessingMode::FragmentedJson);
     mode_map.insert((0x0016, 0x0102), ProcessingMode::Fragmented);
     mode_map.insert((0x0016, 0x0103), ProcessingMode::Fragmented);
+    mode_map.insert((0x8000, 0x0103), ProcessingMode::Direct);
+    mode_map.insert((0x8000, 0x0101), ProcessingMode::Direct);
 
     mode_map
         .get(&(order1, order2))
         .cloned()
         .unwrap_or(ProcessingMode::DirectJson)
-}
-
-pub fn read_bytes<'a>(
-    data: &'a [u8],
-    offset: &mut usize,
-    size: usize,
-) -> Result<&'a [u8], &'static str> {
-    if *offset + size > data.len() {
-        return Err("Buffer underflow while reading bytes");
-    }
-    let value = &data[*offset..*offset + size];
-    *offset += size;
-    Ok(value)
-}
-
-pub fn read_u32(data: &[u8], offset: &mut usize) -> Result<u32, &'static str> {
-    let bytes = read_bytes(data, offset, 4)?;
-    Ok(u32::from_le_bytes(bytes.try_into().unwrap()))
-}
-
-pub fn read_f64(data: &[u8], offset: &mut usize) -> Result<f64, &'static str> {
-    let bytes = read_bytes(data, offset, 8)?;
-    Ok(f64::from_le_bytes(bytes.try_into().unwrap()))
-}
-
-pub fn read_string(data: &[u8], offset: &mut usize, len: usize) -> Result<String, &'static str> {
-    let bytes = read_bytes(data, offset, len)?;
-    std::str::from_utf8(bytes)
-        .map(|s| s.to_string())
-        .map_err(|_| "Failed to parse UTF-8 string")
 }
 
 #[repr(C)]
@@ -168,11 +141,26 @@ impl OptimizeInfo {
         })
     }
 }
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GetToken {
+    pub len: u32,
+    pub token: String,
+}
+impl GetToken {
+    pub fn parse_get_token(data: &[u8]) -> Result<GetToken, &'static str> {
+        let mut offset = 0;
+        let len = read_u32(data, &mut offset)?;
+        let token = read_string(data, &mut offset, len as usize)?;
+        Ok(GetToken { len, token })
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum MsgType {
     RealTimeData,
     OptimizeInfo,
+    NcSignalVal,
+    GetToken,
     Unknown, // 未知类型
 }
 
@@ -181,6 +169,8 @@ impl MsgType {
         match self {
             MsgType::RealTimeData => "RealTimeData".to_string(),
             MsgType::OptimizeInfo => "OptimizeInfo".to_string(),
+            MsgType::NcSignalVal => "NcSignalVal".to_string(),
+            MsgType::GetToken => "GetToken".to_string(),
             MsgType::Unknown => "Unknown".to_string(),
         }
     }
@@ -190,6 +180,8 @@ pub fn get_msg(order1: u16, order2: u16) -> MsgType {
     let mut mode_map = HashMap::new();
     mode_map.insert((0x0016, 0x0102), MsgType::RealTimeData);
     mode_map.insert((0x0016, 0x0103), MsgType::OptimizeInfo);
+    mode_map.insert((0x8000, 0x0103), MsgType::NcSignalVal);
+    mode_map.insert((0x8000, 0x0101), MsgType::GetToken);
     mode_map
         .get(&(order1, order2))
         .cloned()

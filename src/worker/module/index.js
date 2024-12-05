@@ -1,1 +1,1 @@
-export default ['OptimizeInfo', 'RealTimeData']
+export default ['OptimizeInfo', 'RealTimeData', 'GetToken']

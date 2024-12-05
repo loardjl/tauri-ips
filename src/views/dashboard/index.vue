@@ -154,7 +154,11 @@ onMounted(() => {
     }
   ]
   init()
-  worker.send('IpsRegister', { name: '' })
+  worker.send('IpsRegister', {})
+  worker.send('getToken', {})
+  worker.dispatch('GetToken', ({ payload }) => {
+    console.log('GetToken', payload)
+  })
   worker.dispatch('RealTimeData', ({ payload }) => {
     realtimeInfo.value = payload.Ok
     console.log('RealTimeData', payload)

@@ -88,7 +88,7 @@ const getMachineList = async () => {
     id: '9',
     params: {}
   })
-  machineTabList.value = res.result.dev_list.filter(d => d.dev_type === 'ARM')
+  machineTabList.value = res.result.dev_list
   if (machineTabList.value.length) {
     devId.value = machineTabList.value[0].dev_id
     await getList()

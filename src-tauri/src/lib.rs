@@ -4,12 +4,12 @@ mod front_data_type;
 mod msg_type;
 mod nc_signal;
 mod tcp_client;
+mod utils;
 
 use api_server::start_server;
 use msg_type::ProtocolHeader;
 use reqwest::header::{self, HeaderMap};
 use serde_json::{json, Value};
-use std::collections::HashMap;
 use std::sync::Arc;
 use tauri::{command, Manager};
 use tcp_client::{TcpClientManager, TcpConfig};

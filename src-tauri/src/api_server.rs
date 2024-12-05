@@ -1,14 +1,17 @@
-use crate::msg_type::{MsgType, OptimizeInfo, ProtocolHeader, RealTimeData};
+use crate::msg_type::{GetToken, MsgType, OptimizeInfo, ProtocolHeader, RealTimeData};
+use crate::nc_signal::{set_nc_signal_val, NcSignal, NcSignalManager, NcSignalVal};
 use crate::tcp_client::TcpClientManager;
 
 use axum::routing::get;
 use bincode::serialize;
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use socketioxide::{
     extract::{Data, SocketRef},
     SocketIo,
 };
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
@@ -25,6 +28,10 @@ struct SendData {
 struct FrontData {
     data: Value,
     msg: String,
+}
+
+lazy_static! {
+    static ref NC_SIGNAL_MANAGER: Mutex<NcSignalManager> = Mutex::new(NcSignalManager::new());
 }
 
 async fn send_tcp(manager: TcpClientManager1, data: Vec<u8>, topic: &str) {
@@ -47,6 +54,7 @@ async fn handle_tcp_messages(client_name: &str, manager: TcpClientManager1, sock
     let client = {
         let manager = manager.lock().await;
         if let Some(client) = manager.get_client(client_name) {
+            drop(manager); // 释放 manager 的锁
             client.clone()
         } else {
             println!("Client '{}' not found", client_name);
@@ -55,6 +63,7 @@ async fn handle_tcp_messages(client_name: &str, manager: TcpClientManager1, sock
     };
     let client = client.lock().await;
     let receiver = client.get_receiver();
+    let topic = client.get_topic();
     drop(client);
     loop {
         let mut receiver_guard = receiver.lock().await;
@@ -75,7 +84,7 @@ async fn handle_tcp_messages(client_name: &str, manager: TcpClientManager1, sock
                                 Err(e) => eprintln!("Failed to parse JSON response: {}", e),
                             }
                         } else {
-                            let decoded = decode_data(data, &msg).await;
+                            let decoded = decode_data(data, &msg, &topic).await;
                             println!("Received response: {:?}", decoded);
                             socket.emit(msg_str, &decoded).ok();
                         }
@@ -96,6 +105,7 @@ async fn maintain_connection(client_name: &str, manager: TcpClientManager1) {
     let client = {
         let manager = manager.lock().await;
         if let Some(client) = manager.get_client(client_name) {
+            drop(manager); // 释放 manager 的锁
             client.clone()
         } else {
             println!("Client '{}' not found", client_name);
@@ -114,9 +124,6 @@ async fn handle_connec(
     socket: &SocketRef,
     manager: TcpClientManager1,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Socket.IO connected");
-
-    // 注册 Socket.IO 事件
     let manager_clone = manager.clone();
     socket.on("IpsRegister", move |Data::<Value>(data)| {
         let manager_clone = manager_clone.clone();
@@ -136,17 +143,35 @@ async fn handle_connec(
             send_tcp(manager_clone, serialized_data, "ips").await;
         });
     });
-
+    let manager_clone = manager.clone();
+    socket.on("getToken", move |Data::<Value>(data)| {
+        let manager_clone = manager_clone.clone();
+        println!("Received getToken message: {:?}", data);
+        tokio::spawn(async move {
+            let ips_register = ProtocolHeader {
+                header: 0x90eb,
+                version: 0x01,
+                order1: 0x0000,
+                order2: 0x0101,
+                state: 0x00,
+                reset: 0x00000000,
+                vor: 0x00,
+                len: 0x0000,
+            };
+            let serialized_data = serialize(&ips_register).unwrap();
+            send_tcp(manager_clone, serialized_data, "dc").await;
+        });
+    });
     // 启动 TCP 消息接收与连接状态维护
-    // tokio::spawn(handle_tcp_messages("ips", manager.clone(), socket.clone()));
     tokio::spawn(handle_tcp_messages("dc", manager.clone(), socket.clone()));
-    // tokio::spawn(maintain_connection("ips", manager.clone()));
     tokio::spawn(maintain_connection("dc", manager.clone()));
+    tokio::spawn(handle_tcp_messages("ips", manager.clone(), socket.clone()));
+    tokio::spawn(maintain_connection("ips", manager.clone()));
 
     Ok(())
 }
 
-async fn decode_data(data: Vec<u8>, msg: &MsgType) -> Result<Value, String> {
+async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value, String> {
     println!("Decoding data: {:?}", data);
     println!("Decoding msg: {:?}", msg);
     match msg {
@@ -170,6 +195,48 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType) -> Result<Value, String> {
                     Ok(value)
                 }
                 Err(e) => Err(format!("Failed to parse OptimizeInfo: {}", e)),
+            }
+        }
+        MsgType::NcSignalVal => {
+            let signal_value = NcSignal::parse_nc_signal(data.as_slice()).unwrap();
+            if topic == "dc" {
+                let nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
+                let signal_data = nc_signal_manager.realtime_data.get("dc").cloned();
+                drop(nc_signal_manager);
+                match signal_data {
+                    Some(mut signal_data) => {
+                        println!("update signal_data: {:?}", signal_data);
+                        set_nc_signal_val(&mut signal_data, signal_value);
+                        let mut nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
+                        nc_signal_manager
+                            .realtime_data
+                            .insert("dc".to_string(), signal_data);
+                    }
+                    None => {
+                        let nc_signal_val =
+                            NcSignalVal::new(signal_value.dev_id, signal_value.collector_id);
+                        let mut realtime_data = HashMap::new();
+                        realtime_data.insert(signal_value.collector_id, nc_signal_val);
+                        set_nc_signal_val(&mut realtime_data, signal_value);
+                        let mut nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
+                        nc_signal_manager
+                            .realtime_data
+                            .insert("dc".to_string(), realtime_data);
+                        println!("insert signal_data: {:?}", nc_signal_manager.realtime_data);
+                    }
+                }
+            }
+            Ok(json!(""))
+        }
+        MsgType::GetToken => {
+            let result = GetToken::parse_get_token(&data);
+            match result {
+                Ok(value) => {
+                    println!("Decoded GetToken: {:?}", value);
+                    let value = json!(value);
+                    Ok(value)
+                }
+                Err(e) => Err(format!("Failed to parse GetToken: {}", e)),
             }
         }
         MsgType::Unknown => Err("Unknown message type".to_string()),
