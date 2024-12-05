@@ -207,7 +207,7 @@ const toolhistoryFun = async () => {
         method: 'get_workpiece_tool_history',
         id: '16',
         params: {
-          program_name: program_num.value === '' ? -1 : program_num.value,
+          program_name: program_num.value,
           start_time: startTime.value ? startTime.value : -1,
           end_time: endTime.value ? endTime.value : -1,
           start: startPage.value * cont.value,

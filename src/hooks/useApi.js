@@ -2,7 +2,7 @@ import { onUnmounted } from 'vue'
 import { useMenuStore } from '@src/store/useMenu'
 import { invoke } from '@tauri-apps/api/tauri'
 
-const URL = import.meta.env.VITE_API_HOST
+const URL = await invoke('get_api_host')
 export const useApi = () => {
   const menuStore = useMenuStore()
   const fetchGetApi = async url => {

@@ -25,9 +25,14 @@ ips:
     host: 172.16.10.237
     port: 9998
 
+socket_server:
+  tcp:
+    port: 25572
+
 local:
   http:
-    port: 25572
+    host: 127.0.0.1
+    port: 10010
 
 show_logo: true
 

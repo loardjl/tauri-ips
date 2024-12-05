@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_yaml;
-use std::fs;
+use std::{fs, str};
 // use std::path::PathBuf;
 use std::path::{Path, PathBuf};
 
@@ -10,10 +10,15 @@ pub struct AppConfig {
     pub dc: DcConfig,
     pub cloud: CloudConfig,
     pub ips: IpsConfig,
+    pub socket_server: SocketServerObj,
     pub local: LocalConfig,
     pub show_logo: bool,
     pub eoms: EomsConfig,
     pub monitor: MonitorConfig,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SocketServerObj {
+    pub tcp: PortObj,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -36,7 +41,7 @@ pub struct IpsConfig {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LocalConfig {
-    pub http: PortObj,
+    pub http: HostPortObj,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

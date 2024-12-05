@@ -42,6 +42,14 @@ async fn send_http_get_msg(url: String) -> Result<String, ()> {
     let body = res.text().await.unwrap();
     Ok(body)
 }
+#[command]
+async fn get_api_host() -> Result<String, ()> {
+    let config = config::read_config().expect("failed to read config");
+    Ok(format!(
+        "http://{}:{}",
+        config.local.http.host, config.local.http.port
+    ))
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[tokio::main]
@@ -119,7 +127,7 @@ pub async fn run() {
     // 启动 服务
     let manager_clone = manager.clone();
     tokio::spawn(async move {
-        if let Err(e) = start_server(config.local.http.port, manager_clone).await {
+        if let Err(e) = start_server(config.socket_server.tcp.port, manager_clone).await {
             eprintln!("Failed to start server: {}", e);
         }
     });
@@ -136,7 +144,8 @@ pub async fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             send_http_post_msg,
-            send_http_get_msg
+            send_http_get_msg,
+            get_api_host
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

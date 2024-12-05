@@ -2,34 +2,40 @@
   <div class="ch1-wrap">
     <div v-if="isEdit">
       <van-form colon label-align="right" label-width="180">
-        <div
-          class="conbine-input flex-start"
-          v-for="child in signalsList[0]"
-          :key="child.sig_id + child.addr_type"
-        >
-          <van-field
-            v-model="controlListObj[child.addr_type]"
-            is-link
-            readonly
-            :label="child.display_name"
-            placeholder="请选择"
-            @click="handleShowPicker(child)"
-          />
-          <van-field v-model="child.addr" name="" label="" placeholder="请输入" />
-        </div>
+        <template v-for="child in signalsList[0]" :key="child.sig_id + child.addr_type">
+          <div class="conbine-input flex-start" v-if="child.sig_id < 1000">
+            <van-field
+              v-model="collectTypesObj[child.addr_type]"
+              is-link
+              readonly
+              :label="child.display_name"
+              placeholder="请选择"
+              @click="handleShowPicker(child)"
+            />
+            <van-field
+              v-model="child.addr"
+              name=""
+              label=""
+              :placeholder="child.addr_type === 0 ? '--' : '请输入'"
+              :disabled="child.addr_type === 0"
+            />
+          </div>
+        </template>
       </van-form>
     </div>
     <div class="list-con flex-start" v-else-if="signalsList.length">
-      <div class="item" v-for="(child, i) in signalsList[0]" :key="i">
-        <div class="label">{{ child.display_name }}：</div>
-        <div class="value">{{ child.realTimeData.val[0] }}</div>
-      </div>
+      <template v-for="(child, i) in signalsList[0]" :key="i">
+        <div class="item" v-if="child.sig_id < 1000">
+          <div class="label">{{ child.display_name }}：</div>
+          <div class="value">{{ child.realTimeData.val[0] }}</div>
+        </div>
+      </template>
     </div>
 
     <van-popup v-model:show="showPicker" round position="bottom">
       <van-picker
         option-height="54px"
-        :columns="controlList"
+        :columns="collectTypes"
         @cancel="showPicker = false"
         @confirm="onConfirm"
         v-model="curPicker"
@@ -42,7 +48,8 @@
 import { ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import popover from '@components/common/popover/inedx.vue'
-import { controlList, controlListObj } from '@src/utils/enum'
+import { collectTypes, collectTypesObj } from '@src/utils/enum'
+import { _public } from '@src/utils/common'
 import { useApi } from '@src/hooks/useApi'
 const { fetchPostApi } = useApi()
 import { useSysStore } from '@src/store/useSys'
@@ -54,7 +61,6 @@ const { asideList } = storeToRefs(menuStore)
 // import { useRouter } from 'vue-router'
 // const router = useRouter()
 
-console.log(9999, controlListObj, fetchPostApi, devId.value)
 const props = defineProps({
   // 信号数据源
   signalsList: {
@@ -77,6 +83,9 @@ const handleShowPicker = child => {
 const showPicker = ref(false)
 const onConfirm = ({ selectedOptions }) => {
   curSignal.value.addr_type = selectedOptions[0].value
+  if (curSignal.value.addr_type === 0) {
+    curSignal.value.addr = ''
+  }
   showPicker.value = false
   console.log(111, props.signalsList)
 }
@@ -85,15 +94,58 @@ const isEdit = ref(false)
 // const formData = ref({})
 // 保存确认框
 const popoverRef = ref()
+
+const pathNumList = ref([]) // 所有的通道列表
+// 当前需要展示通道下的指标
+const tempSignal = ref([])
+let copyTempSignal = []
+const tempSignalForm = ref({
+  tempSignal: tempSignal.value
+})
+// 获取机床详情列表
+const machineDetailList = ref([])
+const getDevList = async () => {
+  const res = await fetchPostApi({
+    version: '1.0',
+    method: 'enum_dev_detail_info',
+    id: '67',
+    params: {}
+  })
+  machineDetailList.value = res.result.dev_info_list
+  // 找出所有NC的通道
+  const adapterInfoList = machineDetailList.value.find(item => item.dev_info.dev_id === devId.value)
+  if (adapterInfoList) {
+    adapterInfoList.adapter_info_list.forEach(val => {
+      // = 1 代表是nc
+      if (val.adapter_info.collector_type_id === 1) {
+        pathNumList.value.push({
+          id: val.adapter_info.id,
+          path_num: val.adapter_info.path_num
+        })
+      }
+    })
+  }
+
+  tempSignal.value = JSON.parse(
+    JSON.stringify(
+      props.signalsList[pathNumList.value.find(d => d.id === +props.curAdapterId).path_num - 1]
+    )
+  ).filter(item => {
+    return item.sig_id < 1000
+  })
+  copyTempSignal = _public.deepCopy(tempSignal.value)
+  tempSignalForm.value.tempSignal = tempSignal.value
+}
 const findEditFields = () => {
+  console.log(9999888, copyTempSignal, tempSignalForm.value.tempSignal)
   const result = []
-  // copyTempSignal.forEach(old => {
-  //   tempSignalForm.value.tempSignal.forEach(cur => {
-  //     if (old.sig_id === cur.sig_id && !_public._equals(cur, old)) {
-  //       result.push(cur)
-  //     }
-  //   })
-  // })
+  copyTempSignal.forEach(old => {
+    tempSignalForm.value.tempSignal.forEach(cur => {
+      if (old.sig_id === cur.sig_id && !_public._equals(cur, old)) {
+        result.push(cur)
+      }
+    })
+  })
   return result
 }
 // 保存
@@ -102,7 +154,10 @@ const handleSave = async () => {
   try {
     for (const val of arr) {
       if ((val.addr && val.addr_type !== 0) || (!val.addr && val.addr_type !== 3)) {
-        // const tempId = pathNumList.value.filter(item => item.id === val.id)[0].id
+        const tempId = pathNumList.value.filter(item => item.id === val.id)[0].id
+
+        console.log(222222, arr, val, tempId)
+        return
         // await fetchPostApi({
         //   version: '1.0',
         //   method: 'set_signal_info',
@@ -228,6 +283,7 @@ watch(
 )
 
 onMounted(() => {
+  getDevList()
   asideList.value = [
     {
       key: 'back',

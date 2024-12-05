@@ -342,19 +342,19 @@ const controlFeed = ref({
   ctrl_addr: ''
 })
 const controlPicker = ref(false)
-const controlPickerVal = ref(0)
+const controlPickerVal = ref([0])
 const controlType = ref(0)
 const showControlPicker = type => {
   controlType.value = type
   switch (type) {
     case 1:
-      controlPickerVal.value = controlOnOff.value.ctrl_addr_type
+      controlPickerVal.value = [controlOnOff.value.ctrl_addr_type]
       break
     case 2:
-      controlPickerVal.value = controlSpeed.value.ctrl_addr_type
+      controlPickerVal.value = [controlSpeed.value.ctrl_addr_type]
       break
     case 3:
-      controlPickerVal.value = controlFeed.value.ctrl_addr_type
+      controlPickerVal.value = [controlFeed.value.ctrl_addr_type]
       break
   }
   controlPicker.value = true
@@ -395,19 +395,19 @@ const getRateCtrlParams = async () => {
     if (temp0) {
       controlOnOff.value = temp0
       controlOnOff.value.ctrl_addr_type_name =
-        controlList.value.find(item => item.value === temp0.ctrl_addr_type)?.text || ''
+        controlList.find(item => item.value === temp0.ctrl_addr_type)?.text || ''
     }
     const temp1 = tempList.find(item => item.ctrl_type === 1)
     if (temp1) {
       controlFeed.value = temp1
       controlFeed.value.ctrl_addr_type_name =
-        controlList.value.find(item => item.value === temp1.ctrl_addr_type)?.text || ''
+        controlList.find(item => item.value === temp1.ctrl_addr_type)?.text || ''
     }
     const temp2 = tempList.find(item => item.ctrl_type === 2)
     if (temp2) {
       controlSpeed.value = temp2
       controlSpeed.value.ctrl_addr_type_name =
-        controlList.value.find(item => item.value === temp2.ctrl_addr_type)?.text || ''
+        controlList.find(item => item.value === temp2.ctrl_addr_type)?.text || ''
     }
   }
 }
@@ -736,6 +736,9 @@ const findSigId = (arr, sig_id) => {
 
 // 订阅实时数据
 const subscribeRealTime = async () => {
+  if (!sessionStorage.getItem('token')) {
+    return false
+  }
   // ------------ 开始订阅数据
   for (const adapter_id of adapterIds) {
     await fetchPostApi({

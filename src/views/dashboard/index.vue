@@ -155,15 +155,11 @@ onMounted(() => {
   ]
   init()
   worker.send('IpsRegister', {})
-  worker.send('getToken', {})
-  worker.dispatch('GetToken', ({ payload }) => {
-    sessionStorage.setItem('token', payload.Ok.token)
-  })
   worker.dispatch('RealTimeData', ({ payload }) => {
     realtimeInfo.value = payload.Ok
     console.log('RealTimeData', payload)
-    getstrategFun()
   })
+  getstrategFun()
   worker.dispatch('OptimizeInfo', ({ payload }) => {
     console.log('OptimizeInfo', payload)
     optimizeInfo.value = payload.Ok

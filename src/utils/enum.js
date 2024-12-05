@@ -18,11 +18,26 @@ export const sig_data_type = new Map([
  * @Date: 2023-10-12 14:08:58
  * @Description: 采集方式
  */
-export const enumAddrType = new Map([
-  [0, 'CNC'],
-  [1, 'PMC'],
-  [2, '宏变量']
-])
+export const collectTypesObj = {
+  0: 'CNC',
+  1: 'PMC',
+  2: '宏变量'
+}
+
+export const collectTypes = [
+  {
+    text: 'CNC',
+    value: 0
+  },
+  {
+    text: 'PMC',
+    value: 1
+  },
+  {
+    text: '宏变量',
+    value: 2
+  }
+]
 
 export const controlList = [
   {

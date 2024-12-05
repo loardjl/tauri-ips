@@ -30,7 +30,7 @@ const themVars = reactive({
   switchOnBackground: baseColor
 })
 
-const { signal } = useSignalController()
+const { signal, worker } = useSignalController()
 
 window.addEventListener(
   'keydown',
@@ -45,7 +45,29 @@ window.addEventListener(
 
 onMounted(() => {
   workpieceStrategy()
+  getDcStatus()
 })
+
+const getDcStatus = () => {
+  // 数据中心服务连接状态推送
+  worker.send('getToken', {})
+  worker.dispatch('GetToken', async ({ payload }) => {
+    sessionStorage.setItem('token', payload.token)
+    try {
+      const res = await fetchPostApi({
+        version: '1.0',
+        method: 'get_edge_device_info',
+        id: '84',
+        params: {}
+      })
+      const { TID } = res.result
+      sessionStorage.setItem('TID', TID)
+    } catch (error) {
+      console.log(error)
+    }
+  })
+}
+
 //全局所有策略配置
 const workpieceStrategy = async () => {
   try {

@@ -88,7 +88,7 @@ const getMachineList = async () => {
     id: '9',
     params: {}
   })
-  machineTabList.value = res.result.dev_list
+  machineTabList.value = res.result.dev_list.filter(d => d.dev_type === 'ARM')
   if (machineTabList.value.length) {
     devId.value = machineTabList.value[0].dev_id
     await getList()
@@ -157,17 +157,6 @@ const getList = async () => {
 
 // 获取采集器状态 -- 递归方法
 const getAdapterStatus = async item => {
-  await fetchPostApi({
-    version: '1.0',
-    method: 'subscribe_single_signal',
-    id: '32',
-    params: {
-      dev_id: devId.value,
-      adapter_id: +item.id,
-      sig_id_list: [],
-      token: sessionStorage.getItem('token')
-    }
-  })
   const res = await fetchPostApi({
     version: '1.0',
     method: 'get_adapter_status',
