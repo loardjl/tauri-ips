@@ -64,11 +64,11 @@
         </div>
         <div>
           <span>进给倍率:</span>
-          <integer v-model="strategiesItem.overload_protection_feed_rate" title="进给倍率" />
+          <integer v-model="strategiesItem.overload_protection_feed_rate" title="进给倍率(%)" />
         </div>
         <div>
           <span>系数:</span>
-          <decimal v-model="strategiesItem.overload_protection_learn_factor" title="系数" />
+          <decimal v-model="strategiesItem.overload_protection_learn_factor" title="系数(.)" />
         </div>
       </div>
       <div class="optimize" v-if="strategyParameters === 2">
@@ -84,11 +84,11 @@
           </div>
           <div>
             <span>进给倍率:</span>
-            <integer v-model="strategiesItem.optimize_ctrl_feed_rate" title="进给倍率" />
+            <integer v-model="strategiesItem.optimize_ctrl_feed_rate" title="进给倍率(%)" />
           </div>
           <div>
             <span>系数:</span>
-            <decimal v-model="strategiesItem.optimize_ctrl_learn_factor" title="系数" />
+            <decimal v-model="strategiesItem.optimize_ctrl_learn_factor" title="系数(.)" />
           </div>
         </div>
         <div class="opt-contet">
@@ -104,11 +104,17 @@
           <div class="opt-btn">
             <div>
               <span>上限进给倍率:</span>
-              <integer v-model="strategiesItem.optimize_ctrl_max_feed_rate" title="上限进给倍率" />
+              <integer
+                v-model="strategiesItem.optimize_ctrl_max_feed_rate"
+                title="上限进给倍率(%)"
+              />
             </div>
             <div>
               <span>下限进给倍率:</span>
-              <integer v-model="strategiesItem.optimize_ctrl_min_feed_rate" title="下限进给倍率" />
+              <integer
+                v-model="strategiesItem.optimize_ctrl_min_feed_rate"
+                title="下限进给倍率(%)"
+              />
             </div>
           </div>
         </div>
@@ -126,7 +132,7 @@
           </div>
           <div>
             <span>进给倍率:</span>
-            <integer v-model="strategiesItem.touch_feed_rate" title="进给倍率" />
+            <integer v-model="strategiesItem.touch_feed_rate" title="进给倍率(%)" />
           </div>
         </div>
         <div class="con-contet">
@@ -141,15 +147,15 @@
           </div>
           <div>
             <span>在生效持续时间:</span>
-            <integer v-model="strategiesItem.touch_revival_duration" title="在生效持续时间" />
+            <integer v-model="strategiesItem.touch_revival_duration" title="在生效持续时间(s)" />
           </div>
           <div>
             <span>切入保护时间:</span>
-            <integer v-model="strategiesItem.touch_entry_protection_time" title="切入保护时间" />
+            <decimal v-model="strategiesItem.touch_entry_protection_time" title="切入保护时间(s)" />
           </div>
           <div>
             <span>接触保护倍率:</span>
-            <integer v-model="strategiesItem.touch_protection_rate" title="接触保护倍率" />
+            <integer v-model="strategiesItem.touch_protection_rate" title="接触保护倍率(%)" />
           </div>
         </div>
       </div>
@@ -268,7 +274,8 @@ const workpieceStrategy = async () => {
       item.optimize_ctrl_min_feed_rate = (item.optimize_ctrl_min_feed_rate * 100).toFixed(0)
       item.touch_feed_rate = (item.touch_feed_rate * 100).toFixed(0)
       item.touch_protection_rate = (item.touch_protection_rate * 100).toFixed(0)
-      item.touch_entry_protection_time = item.touch_entry_protection_time.toFixed(0)
+      item.touch_entry_protection_time = (item.touch_entry_protection_time / 1000).toFixed(1)
+      item.touch_revival_duration = (item.touch_revival_duration / 1000).toFixed(0)
     })
     strategiesid.value = data.result.strategies[0].strategy_id
     strategies.value = data.result.strategies
@@ -290,6 +297,9 @@ const setStrategyFun = async () => {
     strategiesItem.value.optimize_ctrl_min_feed_rate / 100
   strategiesItem.value.touch_feed_rate = strategiesItem.value.touch_feed_rate / 100
   strategiesItem.value.touch_protection_rate = strategiesItem.value.touch_protection_rate / 100
+  strategiesItem.value.touch_entry_protection_time =
+    strategiesItem.value.touch_entry_protection_time * 1000
+  strategiesItem.value.touch_revival_duration = strategiesItem.value.touch_revival_duration * 1000
   try {
     const res = await fetchPostApi(
       {
