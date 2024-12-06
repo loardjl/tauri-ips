@@ -45,8 +45,10 @@
               }}</span>
             </div>
             <div class="con-btn-rig">
-              <div :class="j.className">
-                <span class="percentage">{{ j.optimize_ratio.toFixed(2) }}%</span>
+              <div :style="j.styleName">
+                <span class="percentage">{{
+                  j.enable ? j.optimize_ratio.toFixed(2) + '%' : '--'
+                }}</span>
                 <!-- <span class="tool">{{ j.optimize_ratio }}</span>
                 <span class="num">{{ j.optimize_ratio }}</span> -->
               </div>
@@ -217,6 +219,8 @@ const toolhistoryFun = async () => {
       'ipsbatch'
     )
     const data = res
+    console.log(data)
+
     strategies.forEach(item => {
       data.result.workpiece_tool_historys.forEach(j => {
         j.strategy_historys.forEach(i => {
@@ -238,10 +242,18 @@ const toolhistoryFun = async () => {
 const findMaxes = arr => {
   const sortedArr = [...arr].sort((a, b) => b.optimize_ratio - a.optimize_ratio)
   sortedArr.forEach((item, index) => {
-    if (index === 0) item.className = 'purpleramp100'
-    if (index === 1) item.className = 'purpleramp60'
-    if (index === 2) item.className = 'purpleramp30'
-    if (index === 3) item.className = 'purpleramp10'
+    if (item.enable) {
+      item.styleName = `background: linear-gradient(to right, rgb(80, 104, 190) 0%, rgba(45, 91, 255, 0) ${
+        100 - index * 20
+      }%);`
+    } else {
+      item.styleName = `background: linear-gradient(to right, rgb(187, 188, 185) 0%, rgba(187, 188, 185, 0.1) 100%);`
+    }
+
+    // if (index === 0) item.className = 'purpleramp100'
+    // if (index === 1) item.className = 'purpleramp60'
+    // if (index === 2) item.className = 'purpleramp30'
+    // if (index === 3) item.className = 'purpleramp10'
   })
   arr.forEach(item => {
     sortedArr.forEach(j => {

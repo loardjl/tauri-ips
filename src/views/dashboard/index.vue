@@ -165,6 +165,16 @@ onMounted(() => {
   getstrategFun()
   worker.dispatch('OptimizeInfo', ({ payload }) => {
     console.log('OptimizeInfo', payload)
+    payload.Ok.total_optimize_time =
+      payload.Ok.total_optimize_time < 0 ? 0 : payload.Ok.total_optimize_time
+    payload.Ok.total_processing_time =
+      payload.Ok.total_processing_time < 0 ? 0 : payload.Ok.total_processing_time
+    payload.Ok.dayly_optimize_time =
+      payload.Ok.dayly_optimize_time < 0 ? 0 : payload.Ok.dayly_optimize_time
+    payload.Ok.weekly_optimize_time =
+      payload.Ok.weekly_optimize_time < 0 ? 0 : payload.Ok.weekly_optimize_time
+    payload.Ok.monthly_optimize_time =
+      payload.Ok.monthly_optimize_time < 0 ? 0 : payload.Ok.monthly_optimize_time
     optimizeInfo.value = payload.Ok
   })
 })

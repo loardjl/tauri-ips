@@ -17,15 +17,20 @@
           </template>
         </vxe-column>
         <vxe-column field="standard_time" title="优化前"></vxe-column>
-        <vxe-column field="actual_time" title="优化后"></vxe-column>
+        <vxe-column field="actual_time" title="优化后">
+          <template #default="{ row }">
+            <span>{{ row.optimize_enable ? row.actual_time : '-' }}</span>
+          </template>
+        </vxe-column>
         <vxe-column field="optimize_ratio" title="节省时间(s)/比率" width="260">
           <template #default="{ row }">
-            <div class="optimizeratio">
+            <div class="optimizeratio" v-if="row.optimize_enable">
               <span :class="[row.optimize_ratio > 100 ? 'green' : '']">
                 {{ (row.optimize_time / 1000).toFixed(2) }}</span
               >/<span>{{ row.optimize_ratio.toFixed(2) }}%</span>
               <img v-show="row.optimize_ratio > 100" src="@src/assets/icons/svg/arrow.svg" alt="" />
             </div>
+            <span v-else>-</span>
           </template>
         </vxe-column>
       </vxe-table>

@@ -33,8 +33,16 @@
         <vxe-column field="tool_number" title="刀具号"></vxe-column>
         <vxe-column field="strategy_name" title="优化策略"></vxe-column>
         <vxe-column field="standard_time" title="优化前"></vxe-column>
-        <vxe-column field="actual_time" title="优化后"></vxe-column>
-        <vxe-column field="optimize_time" title="节省时间(s)"> </vxe-column>
+        <vxe-column field="actual_time" title="优化后">
+          <template #default="{ row }">
+            <span>{{ row.optimize_enable ? row.actual_time : '-' }}</span>
+          </template>
+        </vxe-column>
+        <vxe-column field="optimize_time" title="节省时间(s)">
+          <template #default="{ row }">
+            <span>{{ row.optimize_enable ? row.optimize_time : '-' }}</span>
+          </template>
+        </vxe-column>
       </vxe-table>
     </div>
     <div class="empty" v-if="!tableData.length">
