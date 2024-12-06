@@ -112,24 +112,24 @@ impl RealTimeData {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct OptimizeInfo {
-    pub total_optimize_time: u32,    //总提效时间
-    pub total_processing_time: u32,  //总加工时间
-    pub total_processing_count: u32, //总加工件数
-    pub dayly_optimize_time: u32,    //当日提效时间
-    pub weekly_optimize_time: u32,   //最近一周提效时间
-    pub monthly_optimize_time: u32,  //最近一个月提效时间
+    pub total_optimize_time: i32,    //总提效时间
+    pub total_processing_time: i32,  //总加工时间
+    pub total_processing_count: i32, //总加工件数
+    pub dayly_optimize_time: i32,    //当日提效时间
+    pub weekly_optimize_time: i32,   //最近一周提效时间
+    pub monthly_optimize_time: i32,  //最近一个月提效时间
 }
 
 impl OptimizeInfo {
     pub fn to_string(data: &[u8]) -> Result<OptimizeInfo, &'static str> {
         let mut offset = 0;
 
-        let total_optimize_time = read_u32(data, &mut offset)?;
-        let total_processing_time = read_u32(data, &mut offset)?;
-        let total_processing_count = read_u32(data, &mut offset)?;
-        let dayly_optimize_time = read_u32(data, &mut offset)?;
-        let weekly_optimize_time = read_u32(data, &mut offset)?;
-        let monthly_optimize_time = read_u32(data, &mut offset)?;
+        let total_optimize_time = read_i32(data, &mut offset)?;
+        let total_processing_time = read_i32(data, &mut offset)?;
+        let total_processing_count = read_i32(data, &mut offset)?;
+        let dayly_optimize_time = read_i32(data, &mut offset)?;
+        let weekly_optimize_time = read_i32(data, &mut offset)?;
+        let monthly_optimize_time = read_i32(data, &mut offset)?;
 
         Ok(OptimizeInfo {
             total_optimize_time,

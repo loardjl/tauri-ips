@@ -22,8 +22,8 @@
           <template #default="{ row }">
             <div class="optimizeratio">
               <span :class="[row.optimize_ratio > 100 ? 'green' : '']">
-                {{ row.optimize_time }}</span
-              >/<span>{{ row.optimize_ratio }}%</span>
+                {{ (row.optimize_time / 1000).toFixed(2) }}</span
+              >/<span>{{ row.optimize_ratio.toFixed(2) }}%</span>
               <img v-show="row.optimize_ratio > 100" src="@src/assets/icons/svg/arrow.svg" alt="" />
             </div>
           </template>

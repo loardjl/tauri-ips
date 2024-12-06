@@ -15,7 +15,10 @@
       </div>
       <div>
         <span>节省时间(s)/比率(s):</span>
-        <span>{{ rowValue.optimize_time }} / {{ rowValue.optimize_ratio }}%</span>
+        <span
+          >{{ (rowValue.optimize_time / 1000).toFixed(2) }} /
+          {{ rowValue.optimize_ratio.toFixed(2) }}%</span
+        >
       </div>
     </div>
     <div class="table">
@@ -104,6 +107,7 @@ const process_history = async () => {
     data.result.workpiece_process_historys.forEach(item => {
       item.actual_time = _public.getTime(item.actual_time, '{h}:{m}:{s}')
       item.standard_time = _public.getTime(item.standard_time, '{h}:{m}:{s}')
+      item.optimize_time = (item.optimize_time / 1000).toFixed(2)
     })
     tableData.value = data.result.workpiece_process_historys
     total.value = data.result.total
@@ -152,7 +156,7 @@ const nextFun = () => {
     & > div {
       font-size: 22px;
       color: rgba(52, 52, 52, 0.5);
-      margin-right: 24px;
+      margin-right: 18px;
       & > :last-child {
         margin-left: 10px;
       }

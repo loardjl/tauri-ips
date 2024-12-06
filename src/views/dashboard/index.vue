@@ -160,7 +160,7 @@ onMounted(() => {
     payload.Ok.nc_knob_feedback = (payload.Ok.nc_knob_feedback * 100).toFixed(0)
     realtimeInfo.value = payload.Ok
     init()
-    console.log('RealTimeData', payload)
+    // console.log('RealTimeData', payload)
   })
   getstrategFun()
   worker.dispatch('OptimizeInfo', ({ payload }) => {

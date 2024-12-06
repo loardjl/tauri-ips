@@ -46,7 +46,7 @@
             </div>
             <div class="con-btn-rig">
               <div :class="j.className">
-                <span class="percentage">{{ j.optimize_ratio }}</span>
+                <span class="percentage">{{ j.optimize_ratio.toFixed(2) }}%</span>
                 <!-- <span class="tool">{{ j.optimize_ratio }}</span>
                 <span class="num">{{ j.optimize_ratio }}</span> -->
               </div>
