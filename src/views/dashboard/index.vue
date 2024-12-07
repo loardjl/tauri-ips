@@ -147,7 +147,7 @@ onMounted(() => {
     {
       key: 'strategy',
       // text: strategEnable.value ? '关闭提效' : '开启提效',
-      text: computed(() => (strategEnable.value ? '开启提效' : '关闭提效')),
+      text: computed(() => (strategEnable.value ? '关闭提效' : '开启提效')),
       cb: () => {
         strategFun()
       }
@@ -238,8 +238,8 @@ const strategFun = async () => {
     )
     const data = res
     let text = ''
-    if (strategEnable.value) text = '关闭提效'
-    else text = '开启提效'
+    if (strategEnable.value) text = '开启提效'
+    else text = '关闭提效'
     if (!data.result.status) proxy.$alertMsg('checked', '', text + '成功', { type: 'success' })
     else proxy.$alertMsg('clear', '', text + '失败', { type: 'danger' })
     getstrategFun()
@@ -259,6 +259,7 @@ const getstrategFun = async () => {
       'ipsbatch'
     )
     const data = res
+    console.log(res)
     strategEnable.value = data.result.enable
   } catch (e) {
     console.log(e)
