@@ -2,8 +2,8 @@
   <div class="ch1-wrap">
     <div v-if="isEdit">
       <van-form colon label-align="right" label-width="180">
-        <template v-for="child in signalsList[0]" :key="child.sig_id + child.addr_type">
-          <div class="conbine-input flex-start" v-if="child.sig_id < 1000">
+        <template v-for="child in signalsListItem" :key="child.sig_id + child.addr_type">
+          <div class="conbine-input flex-start">
             <van-field
               v-model="collectTypesObj[child.addr_type]"
               is-link
@@ -23,9 +23,9 @@
         </template>
       </van-form>
     </div>
-    <div class="list-con flex-start" v-else-if="signalsList.length">
-      <template v-for="(child, i) in signalsList[0]" :key="i">
-        <div class="item" v-if="child.sig_id < 1000">
+    <div class="list-con flex-start" v-else-if="signalsListItem.length">
+      <template v-for="(child, i) in signalsListItem" :key="i">
+        <div class="item">
           <div class="label">{{ child.display_name }}：</div>
           <div class="value">{{ child.realTimeData.val[0] }}</div>
         </div>
@@ -45,19 +45,18 @@
 </template>
 
 <script setup lang="jsx">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, inject } from 'vue'
 import { storeToRefs } from 'pinia'
 import popover from '@components/common/popover/inedx.vue'
 import { collectTypes, collectTypesObj } from '@src/utils/enum'
 import { _public } from '@src/utils/common'
-import { useApi } from '@src/hooks/useApi'
-const { fetchPostApi } = useApi()
 import { useSysStore } from '@src/store/useSys'
 const sysStore = useSysStore()
 const { devId } = storeToRefs(sysStore)
 import { useMenuStore } from '@src/store/useMenu'
 const menuStore = useMenuStore()
 const { asideList } = storeToRefs(menuStore)
+const fetchPostApi = inject('fetchPostApi')
 // import { useRouter } from 'vue-router'
 // const router = useRouter()
 
@@ -66,11 +65,13 @@ const props = defineProps({
   signalsList: {
     type: Array
   },
+  signalsListItem: {
+    type: Array
+  },
   curAdapterId: {
     type: String
   }
 })
-console.log(9999, props.signalsList)
 
 const curSignal = ref({})
 const curPicker = ref([0])
@@ -157,22 +158,21 @@ const handleSave = async () => {
         const tempId = pathNumList.value.filter(item => item.id === val.id)[0].id
 
         console.log(222222, arr, val, tempId)
-        return
-        // await fetchPostApi({
-        //   version: '1.0',
-        //   method: 'set_signal_info',
-        //   id: '21',
-        //   params: {
-        //     dev_id: devId.value,
-        //     adapter_id: parseInt(tempId),
-        //     signal_info: {
-        //       sig_id: val.sig_id,
-        //       addr_type: val.addr_type,
-        //       addr: val.addr.toString(),
-        //       addr_len: isNaN(+val.addr_len) ? 10 : +val.addr_len
-        //     }
-        //   }
-        // })
+        await fetchPostApi({
+          version: '1.0',
+          method: 'set_signal_info',
+          id: '21',
+          params: {
+            dev_id: devId.value,
+            adapter_id: parseInt(tempId),
+            signal_info: {
+              sig_id: val.sig_id,
+              addr_type: val.addr_type,
+              addr: val.addr.toString(),
+              addr_len: isNaN(+val.addr_len) ? 10 : +val.addr_len
+            }
+          }
+        })
       }
     }
   } catch {
@@ -191,14 +191,6 @@ watch(
   () => isEdit.value,
   val => {
     if (val) {
-      // const temp = []
-      // props.signalsList.forEach(item => {
-      //   temp.push({
-      //     sig_id: item.sig_id,
-      //     addr_type: item.addr_type,
-      //     value: item.addr
-      //   })
-      // })
       asideList.value = [
         {
           key: 'back',
@@ -314,6 +306,14 @@ onMounted(() => {
     .van-cell__value {
       width: 170px;
     }
+  }
+}
+.list-con {
+  .item {
+    width: 33.33%;
+  }
+  .label {
+    width: 190px;
   }
 }
 </style>
