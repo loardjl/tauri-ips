@@ -13,8 +13,8 @@
           >登录</VanButton
         >
         <div class="device-list">
-          <div class="device-item van-hairline--bottom" v-for="item in deviceList" :key="item.id">
-            <div :class="item.status === 'online' ? 'online' : 'offline'"></div>
+          <div class="device-item van-hairline--bottom" v-for="item in adapterList" :key="item.id">
+            <div :class="item.connect_status === 1 ? 'online' : 'offline'"></div>
             <span>{{ item.name }}</span>
           </div>
         </div>
@@ -48,7 +48,7 @@ const { proxy } = getCurrentInstance()
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const { sysInfo } = storeToRefs(useSysStore())
+const { sysInfo, adapterList } = storeToRefs(useSysStore())
 const isAuth = computed(() => sysInfo.value.role === 'admin')
 
 const matcheds = ref([])
@@ -85,35 +85,6 @@ const logOut = async () => {
     sysInfo.value.role = ''
   }
 }
-
-// 设备信息
-const deviceList = [
-  {
-    id: 1,
-    name: '设备1',
-    status: 'online'
-  },
-  {
-    id: 2,
-    name: '设备2',
-    status: 'offline'
-  },
-  {
-    id: 3,
-    name: '设备3',
-    status: 'online'
-  },
-  {
-    id: 4,
-    name: '设备4',
-    status: 'offline'
-  },
-  {
-    id: 5,
-    name: '设备5',
-    status: 'online'
-  }
-]
 
 const go = item => {
   router.push(item.path)
