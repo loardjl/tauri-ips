@@ -127,6 +127,7 @@ onMounted(() => {
     {
       key: 'policyManagement',
       text: '策略管理',
+      auth: 'admin',
       cb: () => {
         router.push({
           path: '/strategy/policyManagement'
@@ -136,6 +137,7 @@ onMounted(() => {
     {
       key: 'learningStyle',
       text: '学习方式',
+      auth: 'admin',
       cb: () => {
         if (program_num.value === '') {
           proxy.$alertMsg('clear', '', '请选择工件型号', { type: 'danger' })
