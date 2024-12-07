@@ -32,6 +32,19 @@ struct FrontData {
 
 lazy_static! {
     static ref NC_SIGNAL_MANAGER: Mutex<NcSignalManager> = Mutex::new(NcSignalManager::new());
+    static ref START_PUSH_DATA: Mutex<bool> = Mutex::new(false);
+}
+
+pub async fn get_nc_signal_val(socket: &SocketRef) {
+    let nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
+    let signal_data = nc_signal_manager.realtime_data.get("dc").cloned();
+    drop(nc_signal_manager);
+    match signal_data {
+        Some(signal_data) => {
+            socket.emit("StartPushData", &json!(signal_data)).ok();
+        }
+        None => println!("signal_data is None"),
+    }
 }
 
 async fn send_tcp(manager: TcpClientManager1, data: Vec<u8>, topic: &str) {
@@ -86,6 +99,9 @@ async fn handle_tcp_messages(client_name: &str, manager: TcpClientManager1, sock
                         } else {
                             let decoded = decode_data(data, &msg, &topic).await;
                             println!("Received response: {:?}", decoded);
+                            if msg == MsgType::NcSignalVal {
+                                continue;
+                            }
                             socket.emit(msg_str, &decoded).ok();
                         }
                     }
@@ -162,6 +178,34 @@ async fn handle_connec(
             send_tcp(manager_clone, serialized_data, "dc").await;
         });
     });
+    let socket_clone = socket.clone();
+    socket.on("startPushData", move |Data::<Value>(data)| {
+        println!("Received startPushData message: {:?}", data);
+        tokio::spawn(async move {
+            let mut start_push_data = START_PUSH_DATA.lock().await;
+            *start_push_data = true;
+            drop(start_push_data);
+            // 每隔 1 秒推送一次信号值
+            loop {
+                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                let start_push_data = START_PUSH_DATA.lock().await;
+                let should_push = *start_push_data;
+                if should_push {
+                    println!("should_push: {:?}", should_push);
+                    get_nc_signal_val(&socket_clone).await;
+                } else {
+                    break;
+                }
+            }
+        });
+    });
+    socket.on("stopPushData", move |Data::<Value>(data)| {
+        tokio::spawn(async move {
+            println!("Received stopPushData message: {:?}", data);
+            let mut start_push_data = START_PUSH_DATA.lock().await;
+            *start_push_data = false;
+        });
+    });
     // 启动 TCP 消息接收与连接状态维护
     tokio::spawn(handle_tcp_messages("dc", manager.clone(), socket.clone()));
     tokio::spawn(maintain_connection("dc", manager.clone()));
@@ -209,7 +253,7 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
                         nc_signal_manager
                             .realtime_data
                             .insert("dc".to_string(), signal_data);
-                        println!("update signal_data: {:?}", nc_signal_manager.realtime_data);
+                        // println!("update signal_data: {:?}", nc_signal_manager.realtime_data);
                     }
                     None => {
                         let nc_signal_val =
@@ -221,7 +265,7 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
                         nc_signal_manager
                             .realtime_data
                             .insert("dc".to_string(), realtime_data);
-                        println!("insert signal_data: {:?}", nc_signal_manager.realtime_data);
+                        // println!("insert signal_data: {:?}", nc_signal_manager.realtime_data);
                     }
                 }
             }
