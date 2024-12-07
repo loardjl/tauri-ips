@@ -128,10 +128,19 @@
       </van-form>
     </div>
     <div class="view" v-if="tabSelected === 3">
-      <Ch1Wrap :signalsList="signalsList" :curAdapterId="curAdapter" />
+      <Ch1Wrap
+        :signalsList="signalsList"
+        :signalsListItem="signalsListCH"
+        :curAdapterId="curAdapter"
+      />
     </div>
     <div class="view" v-if="tabSelected === 4">
-      <ExtendedFields />
+      <!-- <ExtendedFields /> -->
+      <Ch1Wrap
+        :signalsList="signalsList"
+        :signalsListItem="signalsListExtend"
+        :curAdapterId="curAdapter"
+      />
     </div>
     <van-popup v-model:show="showPicker" round position="bottom">
       <van-picker
@@ -147,15 +156,25 @@
 </template>
 
 <script setup lang="jsx">
-import { ref, onMounted, watch, inject, getCurrentInstance } from 'vue'
+import {
+  ref,
+  onMounted,
+  watch,
+  inject,
+  getCurrentInstance,
+  computed,
+  onBeforeUnmount,
+  provide
+} from 'vue'
 const { proxy } = getCurrentInstance()
 import { storeToRefs } from 'pinia'
 import numberInput from '@components/common/numberInput/index.vue'
 import popover from '@components/common/popover/inedx.vue'
 import Ch1Wrap from './components/Ch1Wrap.vue'
-import ExtendedFields from './components/ExtendedFields.vue'
+// import ExtendedFields from './components/ExtendedFields.vue'
 import { useApi } from '@src/hooks/useApi'
 const { fetchPostApi } = useApi()
+provide('fetchPostApi', fetchPostApi)
 import { useMenuStore } from '@src/store/useMenu'
 const menuStore = useMenuStore()
 const { asideList } = storeToRefs(menuStore)
@@ -181,14 +200,14 @@ _worker.addEventListener(
     const { type, payload } = res.data
     switch (type) {
       // ------ 实时数据回调
-      case 'realTimeCharData':
+      case 'StartPushData':
         // 找到当前实时数据推送的数据是哪个信号，替换对应信号的值
         // 后端设计如此，前端要取出来匹配很复杂...
         console.log('-----------------实时数据列表', payload, signalsList.value)
         for (const i in signalsList.value) {
           for (const [key, value] of Object.entries(payload)) {
-            if (+signalsList.value[i][0].id === key) {
-              for (const [childKey, childValue] of Object.entries(value.metric)) {
+            if (+signalsList.value[i][0].id === +key) {
+              for (const [childKey, childValue] of Object.entries(value.metrics)) {
                 let val = ''
                 switch (childValue.sig_id) {
                   // 设备运行状态从枚举中取出id对应的label并赋值
@@ -656,8 +675,22 @@ const getDevList = async () => {
   // 订阅实时数据
   getRealTime()
 }
-// 准备订阅实时数据
 let signalsList = ref([]) // 信号列表
+const signalsListCH = computed(() => {
+  let temp = []
+  if (signalsList.value[0]) {
+    temp = signalsList.value[0].filter(item => item.sig_id < 1000)
+  }
+  return temp
+})
+const signalsListExtend = computed(() => {
+  let temp = []
+  if (signalsList.value[0]) {
+    temp = signalsList.value[0].filter(item => item.sig_id >= 1000)
+  }
+  return temp
+})
+// 准备订阅实时数据
 const getRealTime = async callback => {
   // ----------------- 获取采集器信号列表
   signalsList.value = []
@@ -755,7 +788,28 @@ const subscribeRealTime = async () => {
     })
   }
   _worker.postMessage({
-    type: 'startPushChartData',
+    type: 'startPushData',
+    payload: {}
+  })
+}
+// 停止订阅实时数据
+const unsubscribeRealTime = async () => {
+  // 取消订阅实时数据
+  for (const adapter_id of adapterIds) {
+    await fetchPostApi({
+      version: '1.0',
+      method: 'unsubscribe_single_signal',
+      id: '33',
+      params: {
+        dev_id: devId.value,
+        adapter_id: parseInt(adapter_id),
+        token: sessionStorage.getItem('token')
+      }
+    })
+  }
+  // 退订实时数据
+  _worker.postMessage({
+    type: 'stopPushData',
     payload: {}
   })
 }
@@ -826,6 +880,9 @@ onMounted(() => {
   getCollectorList()
   getRateCtrlParams()
   asideList.value = [...asideTemp]
+})
+onBeforeUnmount(() => {
+  unsubscribeRealTime()
 })
 </script>
 
