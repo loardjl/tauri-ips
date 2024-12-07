@@ -17,8 +17,12 @@ import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSignalController } from '@src/hooks/useSignalController'
 import { useApi } from '@src/hooks/useApi'
+import { invoke } from '@tauri-apps/api/tauri'
+import { useSysStore } from '@src/store/useSys'
+import { storeToRefs } from 'pinia'
 const { fetchPostApi } = useApi()
 const route = useRoute()
+const { sysInfo } = storeToRefs(useSysStore())
 // const i18nt = computed(() => i18n.global.messages.value[i18n.global.locale.value].el)
 const primaryColor = 'rgb(40, 45, 67)'
 const baseColor = 'rgb(66, 180, 210)'
@@ -46,7 +50,12 @@ window.addEventListener(
 onMounted(() => {
   workpieceStrategy()
   getDcStatus()
+  getRole()
 })
+const getRole = async () => {
+  const res = await invoke('get_role')
+  sysInfo.value.role = res
+}
 
 const getDcStatus = () => {
   // 数据中心服务连接状态推送

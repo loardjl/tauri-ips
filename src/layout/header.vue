@@ -35,12 +35,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, getCurrentInstance } from 'vue'
 import routes from '@src/router/router'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useSysStore } from '@src/store/useSys'
+import { invoke } from '@tauri-apps/api/tauri'
+
+const { proxy } = getCurrentInstance()
+
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
@@ -65,9 +69,22 @@ onMounted(() => {
 const showLogin = ref(false)
 const password = ref('')
 
-const login = () => {}
+const login = async () => {
+  const res = await invoke('change_role', { data: { role: 'admin', password: password.value } })
+  if (res === 'success') {
+    sysInfo.value.role = 'admin'
+    password.value = ''
+  } else {
+    proxy.$alertMsg('clear', '', '密码错误', { type: 'danger' })
+  }
+}
 
-const logOut = () => {}
+const logOut = async () => {
+  const res = await invoke('change_role', { data: { role: 'user', password: '' } })
+  if (res === 'success') {
+    sysInfo.value.role = ''
+  }
+}
 
 // 设备信息
 const deviceList = [

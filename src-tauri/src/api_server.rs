@@ -31,8 +31,29 @@ struct FrontData {
 }
 
 lazy_static! {
-    static ref NC_SIGNAL_MANAGER: Mutex<NcSignalManager> = Mutex::new(NcSignalManager::new());
-    static ref START_PUSH_DATA: Mutex<bool> = Mutex::new(false);
+    static ref NC_SIGNAL_MANAGER: Mutex<NcSignalManager> = Mutex::new(NcSignalManager::new()); // 用于采集配置存储实时信号值
+    static ref START_PUSH_DATA: Mutex<bool> = Mutex::new(false); // 用于控制是否推送信号值
+    static ref ROLE: Mutex<String> = Mutex::new("".to_string()); // 用于存储当前角色
+}
+
+pub async fn change_role(data: Value) -> Result<String, ()> {
+    let mut role = ROLE.lock().await;
+    let cur_role = data["role"].as_str().unwrap();
+    let password = data["password"].as_str().unwrap();
+    if cur_role == "user" {
+        *role = cur_role.to_string();
+        Ok("success".to_string())
+    } else if cur_role == "admin" && password == "admin" {
+        *role = cur_role.to_string();
+        Ok("success".to_string())
+    } else {
+        Ok("failed".to_string())
+    }
+}
+
+pub async fn get_role() -> String {
+    let role = ROLE.lock().await;
+    role.clone()
 }
 
 pub async fn get_nc_signal_val(socket: &SocketRef) {

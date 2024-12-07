@@ -10,7 +10,7 @@ use api_server::start_server;
 use msg_type::ProtocolHeader;
 use reqwest::header::{self, HeaderMap};
 use serde_json::{json, Value};
-use std::sync::Arc;
+use std::{result, sync::Arc};
 use tauri::{command, Manager};
 use tcp_client::{TcpClientManager, TcpConfig};
 use tokio::sync::Mutex;
@@ -49,6 +49,19 @@ async fn get_api_host() -> Result<String, ()> {
         "http://{}:{}",
         config.local.http.host, config.local.http.port
     ))
+}
+
+#[command]
+async fn change_role(data: Value) -> Result<String, ()> {
+    let result = api_server::change_role(data).await;
+    match result {
+        Ok(data) => Ok(data),
+        Err(_) => Ok("failed".to_string()),
+    }
+}
+#[command]
+async fn get_role() -> String {
+    api_server::get_role().await
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -145,7 +158,9 @@ pub async fn run() {
         .invoke_handler(tauri::generate_handler![
             send_http_post_msg,
             send_http_get_msg,
-            get_api_host
+            get_api_host,
+            change_role,
+            get_role
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
