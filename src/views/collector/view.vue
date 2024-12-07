@@ -212,7 +212,7 @@ _worker.addEventListener(
                 switch (childValue.sig_id) {
                   // 设备运行状态从枚举中取出id对应的label并赋值
                   case 33:
-                    val = dccDevNcCheckRun.find(d => d.id === childValue.val[0])?.label
+                    val = dccDevNcCheckRun.find(d => d.id === childValue.val.Integer)?.label
                     signalsList.value[i][
                       findSigId(signalsList.value[i], childKey)
                     ].realTimeData.val[0] = val
@@ -238,7 +238,7 @@ const setSignalData = (childValue, childKey, i) => {
   if (childValue.sig_data_type === 0) {
     data = childValue.val.Integer
   } else if (childValue.sig_data_type === 1) {
-    data = childValue.val.Float
+    data = childValue.val.Float.toFixed(4)
   } else if (childValue.sig_data_type === 3) {
     data = childValue.val.IntSingleValue
   } else {
