@@ -113,8 +113,8 @@ const process_history = async () => {
     )
     const data = res
     data.result.workpiece_process_historys.forEach(item => {
-      item.actual_time = _public.getTime(item.actual_time, '{h}:{m}:{s}')
-      item.standard_time = _public.getTime(item.standard_time, '{h}:{m}:{s}')
+      item.actual_time = _public.getTime(item.actual_time, '{h}:{m}:{s}', false)
+      item.standard_time = _public.getTime(item.standard_time, '{h}:{m}:{s}', false)
       item.optimize_time = (item.optimize_time / 1000).toFixed(2)
     })
     tableData.value = data.result.workpiece_process_historys

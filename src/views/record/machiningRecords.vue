@@ -124,8 +124,8 @@ const workpiece_history = async () => {
     const data = res
     console.log(data)
     data.result.process_historys.forEach(item => {
-      item.actual_time = _public.getTime(item.actual_time, '{h}:{m}:{s}')
-      item.standard_time = _public.getTime(item.standard_time, '{h}:{m}:{s}')
+      item.actual_time = _public.getTime(item.actual_time, '{h}:{m}:{s}', false)
+      item.standard_time = _public.getTime(item.standard_time, '{h}:{m}:{s}', false)
     })
     tableData.value = data.result.process_historys
     total.value = data.result.total

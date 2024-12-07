@@ -241,10 +241,10 @@ export const _public = {
     return ((px / 1920) * 100 * window.screen.width) / 100
   },
   //秒转 秒 小时 分钟 天
-  getTime(time, format) {
+  getTime(time, format, isHour = true) {
     time = time / 1000
     const d = parseInt(time / 60 / 60 / 24)
-    const h = parseInt((time / 60 / 60) % 24)
+    const h = isHour ? parseInt((time / 60 / 60) % 24) : parseInt(time / 60 / 60)
     const m = parseInt((time / 60) % 60)
     const s = parseInt(time % 60)
     const replacements = {

@@ -129,8 +129,8 @@ const getworkpiecemanager = async () => {
     )
     const data = res
     data.result.workpiece_histories.forEach(item => {
-      item.total_optimize_time = _public.getTime(item.total_processing_time, '{h}:{m}:{s}')
-      item.total_processing_time = _public.getTime(item.total_processing_time, '{h}:{m}:{s}')
+      item.total_optimize_time = _public.getTime(item.total_optimize_time, '{h}:{m}:{s}')
+      item.total_processing_time = _public.getTime(item.total_processing_time, '{h}:{m}:{s}', false)
     })
     tableData.value = data.result.workpiece_histories
   } catch (e) {
