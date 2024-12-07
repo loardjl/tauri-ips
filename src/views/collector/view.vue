@@ -219,9 +219,7 @@ _worker.addEventListener(
                     break
                   // FEATURE 后续需要取枚举对应的label可以往下加
                   default:
-                    signalsList.value[i][
-                      findSigId(signalsList.value[i], childKey)
-                    ].realTimeData.val[0] = childValue.val[0]
+                    setSignalData(childValue, childKey, i)
                     break
                 }
               }
@@ -234,6 +232,20 @@ _worker.addEventListener(
   },
   { signal }
 )
+
+const setSignalData = (childValue, childKey, i) => {
+  let data = null
+  if (childValue.sig_data_type === 0) {
+    data = childValue.val.Integer
+  } else if (childValue.sig_data_type === 1) {
+    data = childValue.val.Float
+  } else if (childValue.sig_data_type === 3) {
+    data = childValue.val.IntSingleValue
+  } else {
+    data = childValue.val.String
+  }
+  signalsList.value[i][findSigId(signalsList.value[i], childKey)].realTimeData.val[0] = data
+}
 
 const tabList = [
   {
