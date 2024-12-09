@@ -41,7 +41,7 @@ const menuStore = useMenuStore()
 const { asideList } = storeToRefs(menuStore)
 import { useSysStore } from '@src/store/useSys'
 const sysStore = useSysStore()
-const { devId } = storeToRefs(sysStore)
+const { devId, adapterList } = storeToRefs(sysStore)
 const { worker } = useSignalController()
 console.log(worker)
 const selectedId = ref(0)
@@ -133,7 +133,6 @@ const getMachineList = async () => {
 const tableData = ref([]) // 筛选后页面需要展示
 const allTableData = ref([]) // 实际上列表返回的数据
 let tempTableData = []
-const adapterList = ref([])
 let tableIndex = 0
 let firstNcData = null
 const getList = async () => {
@@ -152,7 +151,7 @@ const getList = async () => {
   tableIndex = 0
   tempTableData = res.result.adapter_list
   tempTableData.length && (await getAdapterStatus(res.result.adapter_list[0]))
-  adapterList.value = tableData.value.filter(d => d.collector_type_id !== 1 && d.connect_status)
+  adapterList.value = tableData.value
 }
 
 // 获取采集器状态 -- 递归方法

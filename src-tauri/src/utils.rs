@@ -34,6 +34,11 @@ pub fn read_u64(data: &[u8], offset: &mut usize) -> Result<u64, &'static str> {
     Ok(u64::from_le_bytes(bytes.try_into().unwrap()))
 }
 
+pub fn read_f32(data: &[u8], offset: &mut usize) -> Result<f32, &'static str> {
+    let bytes = read_bytes(data, offset, 4)?;
+    Ok(f32::from_le_bytes(bytes.try_into().unwrap()))
+}
+
 pub fn read_f64(data: &[u8], offset: &mut usize) -> Result<f64, &'static str> {
     let bytes = read_bytes(data, offset, 8)?;
     Ok(f64::from_le_bytes(bytes.try_into().unwrap()))

@@ -69,7 +69,7 @@ const props = defineProps({
     type: Array
   },
   curAdapterId: {
-    type: String
+    type: [String, Number]
   }
 })
 

@@ -16,10 +16,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import logoPng from '@src/assets/icons/svg/footer/logo.png'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+import { useSysStore } from '@src/store/useSys'
+const { sysInfo } = storeToRefs(useSysStore())
+const isAuth = computed(() => sysInfo.value.role === 'admin')
 const activeKey = ref('home')
 const footerList = ref([
   {
@@ -55,6 +59,9 @@ onMounted(() => {
 })
 
 const handleFooterClick = item => {
+  if (item.key === 'logo' && !isAuth.value) {
+    return
+  }
   activeKey.value = item.key
   if (item.route) {
     router.push(item.route)

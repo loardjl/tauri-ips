@@ -1,4 +1,4 @@
-use crate::utils::{read_bytes, read_u16, read_u32, read_u64, read_u8};
+use crate::utils::{read_bytes, read_f32, read_i32, read_string, read_u32, read_u64, read_u8};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -23,6 +23,13 @@ pub struct Value {
     pub val: Vec<u8>,
     pub timestamp: u64,
 }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum SignalValueType {
+    Integer(i32),
+    Float(f32),
+    IntSingleValue(i32),
+    String(String),
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SignalValue {
@@ -34,6 +41,7 @@ pub struct SignalValue {
     pub buffer_len: u32,
     pub val: Vec<u8>,
 }
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ResultSignalValue {
     pub sig_id: u32,
@@ -42,8 +50,49 @@ pub struct ResultSignalValue {
     pub sig_data_type: u32,
     pub nums: u32,
     pub buffer_len: u32,
-    pub val: Vec<u8>,
+    pub val: SignalValueType,
     pub timestamp: u64,
+}
+impl ResultSignalValue {
+    pub fn new(
+        sig_id: u32,
+        sig_type: u32,
+        sig_freq_type: u32,
+        sig_data_type: u32,
+        nums: u32,
+        buffer_len: u32,
+        timestamp: u64,
+        val: Vec<u8>,
+    ) -> Self {
+        let val = match sig_data_type {
+            0 => {
+                let ints = read_i32(&val, &mut 0).unwrap();
+                SignalValueType::Integer(ints)
+            } // Integer
+            1 => {
+                let floats = read_f32(&val, &mut 0).unwrap();
+                SignalValueType::Float(floats)
+            } // Float
+            3 => {
+                let single_int = val[0] as i32;
+                SignalValueType::IntSingleValue(single_int)
+            } // IntSingleValue
+            _ => {
+                let string = read_string(&val, &mut 0, buffer_len as usize).unwrap();
+                SignalValueType::String(string)
+            } // String for other cases
+        };
+        Self {
+            sig_id,
+            sig_type,
+            sig_freq_type,
+            sig_data_type,
+            nums,
+            buffer_len,
+            val,
+            timestamp,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -140,61 +189,20 @@ pub fn set_nc_signal_val(realtime_data: &mut HashMap<u32, NcSignalVal>, result: 
     }
 
     let data_entry = realtime_data.get_mut(&collector_id).unwrap();
+    // let result_values = vec![];
 
     // 遍历所有值进行处理
-    for mut value in result.values {
-        match value.sig_data_type {
-            0 => {
-                // 32位整型
-                let ints: Vec<u32> = value
-                    .val
-                    .chunks(4)
-                    .map(|chunk| u32::from_le_bytes(chunk.try_into().unwrap()))
-                    .collect();
-                value.val = ints.iter().flat_map(|x| x.to_le_bytes()).collect();
-            }
-            1 => {
-                // 单精度浮点型
-                let floats: Vec<f32> = value
-                    .val
-                    .chunks(4)
-                    .map(|chunk| f32::from_le_bytes(chunk.try_into().unwrap()))
-                    .collect();
-                value.val = floats
-                    .iter()
-                    .flat_map(|x| x.to_le_bytes())
-                    .collect::<Vec<u8>>();
-            }
-            3 => {
-                // 整型单值
-                if !value.val.is_empty() {
-                    value.val = vec![value.val[0]];
-                }
-            }
-            _ => {
-                // 字符串类型
-                if value.buffer_len > 0 {
-                    value.val = value
-                        .val
-                        .iter()
-                        .take(value.buffer_len.try_into().unwrap())
-                        .cloned()
-                        .collect();
-                } else {
-                    value.val.clear();
-                }
-            }
-        }
-        let result_value = ResultSignalValue {
-            sig_id: value.sig_id,
-            sig_type: value.sig_type,
-            sig_freq_type: value.sig_freq_type,
-            sig_data_type: value.sig_data_type,
-            nums: value.nums,
-            buffer_len: value.buffer_len,
-            val: value.val,
-            timestamp: result.timestamp,
-        };
+    for value in result.values {
+        let result_value = ResultSignalValue::new(
+            value.sig_id,
+            value.sig_type,
+            value.sig_freq_type,
+            value.sig_data_type,
+            value.nums,
+            value.buffer_len,
+            result.timestamp,
+            value.val,
+        );
         // 存储解析结果
         if [
             300, 301, 302, 303, 304, 305, 310, 57, 50, 51, 52, 327, 328, 329, 330, 801, 316, 317,
