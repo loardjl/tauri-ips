@@ -132,6 +132,7 @@
         :signalsList="signalsList"
         :signalsListItem="signalsListCH"
         :curAdapterId="curAdapter"
+        :tabType="tabSelected"
       />
     </div>
     <div class="view" v-if="tabSelected === 4">
@@ -140,6 +141,7 @@
         :signalsList="signalsList"
         :signalsListItem="signalsListExtend"
         :curAdapterId="curAdapter"
+        :tabType="tabSelected"
       />
     </div>
     <van-popup v-model:show="showPicker" round position="bottom">

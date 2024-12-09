@@ -70,6 +70,9 @@ const props = defineProps({
   },
   curAdapterId: {
     type: [String, Number]
+  },
+  tabType: {
+    type: [String, Number]
   }
 })
 
@@ -100,9 +103,9 @@ const pathNumList = ref([]) // 所有的通道列表
 // 当前需要展示通道下的指标
 const tempSignal = ref([])
 let copyTempSignal = []
-const tempSignalForm = ref({
-  tempSignal: tempSignal.value
-})
+// const tempSignalForm = ref({
+//   tempSignal: tempSignal.value
+// })
 // 获取机床详情列表
 const machineDetailList = ref([])
 const getDevList = async () => {
@@ -132,16 +135,20 @@ const getDevList = async () => {
       props.signalsList[pathNumList.value.find(d => d.id === +props.curAdapterId).path_num - 1]
     )
   ).filter(item => {
-    return item.sig_id < 1000
+    if (props.tabType === 3) {
+      return item.sig_id < 1000
+    } else {
+      return item.sig_id >= 1000
+    }
   })
   copyTempSignal = _public.deepCopy(tempSignal.value)
-  tempSignalForm.value.tempSignal = tempSignal.value
+  // tempSignalForm.value.tempSignal = tempSignal.value
 }
 const findEditFields = () => {
-  console.log(9999888, copyTempSignal, tempSignalForm.value.tempSignal)
+  // console.log(9999888, copyTempSignal, props.signalsListItem)
   const result = []
   copyTempSignal.forEach(old => {
-    tempSignalForm.value.tempSignal.forEach(cur => {
+    props.signalsListItem.forEach(cur => {
       if (old.sig_id === cur.sig_id && !_public._equals(cur, old)) {
         result.push(cur)
       }
