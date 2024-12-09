@@ -1,6 +1,15 @@
 <template>
   <div>
-    <van-field v-model="inputValue" readonly type="digit" @click="showPicker = true" />
+    <van-field
+      :label="label"
+      :name="name"
+      v-model="inputValue"
+      readonly
+      type="digit"
+      @click="showPicker = true"
+      :rules="rules"
+      :disabled="disabled"
+    />
     <van-popup v-model:show="showPicker" round position="bottom">
       <van-picker
         :title="title"
@@ -25,8 +34,24 @@ const props = defineProps({
   title: {
     type: [String],
     default: '标题'
+  },
+  label: {
+    type: [String],
+    default: ''
+  },
+  name: {
+    type: [String],
+    default: ''
+  },
+  rules: {
+    type: Array
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
+
 const emit = defineEmits(['update:modelValue'])
 
 const inputValue = computed({
@@ -47,6 +72,7 @@ const columns = [
   [
     { text: '0', value: '0' },
     { text: '1', value: '1' },
+    { text: '2', value: '2' },
     { text: '3', value: '3' },
     { text: '4', value: '4' },
     { text: '5', value: '5' },
@@ -58,6 +84,7 @@ const columns = [
   [
     { text: '0', value: '0' },
     { text: '1', value: '1' },
+    { text: '2', value: '2' },
     { text: '3', value: '3' },
     { text: '4', value: '4' },
     { text: '5', value: '5' },

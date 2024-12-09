@@ -52,7 +52,7 @@
       >
     </div>
     <div class="content">
-      <div class="overload" v-if="strategyParameters === 1">
+      <div class="overload" v-show="strategyParameters === 1">
         <div>
           <span>启用状态</span>
           <van-switch
@@ -62,16 +62,37 @@
             :inactive-value="0"
           />
         </div>
-        <div>
-          <span>进给倍率:</span>
-          <integer v-model="strategiesItem.overload_protection_feed_rate" title="进给倍率(%)" />
-        </div>
-        <div>
-          <span>系数:</span>
-          <decimal v-model="strategiesItem.overload_protection_learn_factor" title="系数(.)" />
-        </div>
+        <van-form
+          colon
+          label-align="right"
+          :validate-trigger="['onChange', 'onBlur']"
+          ref="overload"
+        >
+          <integer
+            label="进给倍率"
+            name="overloadfeedrate"
+            v-model="strategiesItem.overload_protection_feed_rate"
+            title="进给倍率(%)"
+            :rules="[
+              {
+                validator: overloadfeedrate
+              }
+            ]"
+          />
+          <decimal
+            label="系数"
+            name="overloadprotection"
+            v-model="strategiesItem.overload_protection_learn_factor"
+            title="系数(.)"
+            :rules="[
+              {
+                validator: overloadprotection
+              }
+            ]"
+          />
+        </van-form>
       </div>
-      <div class="optimize" v-if="strategyParameters === 2">
+      <div class="optimize" v-show="strategyParameters === 2">
         <div class="opt-header">
           <div>
             <span>启用状态</span>
@@ -82,14 +103,35 @@
               :inactive-value="0"
             />
           </div>
-          <div>
-            <span>进给倍率:</span>
-            <integer v-model="strategiesItem.optimize_ctrl_feed_rate" title="进给倍率(%)" />
-          </div>
-          <div>
-            <span>系数:</span>
-            <decimal v-model="strategiesItem.optimize_ctrl_learn_factor" title="系数(.)" />
-          </div>
+          <van-form
+            colon
+            label-align="right"
+            :validate-trigger="['onChange', 'onBlur']"
+            ref="optimizectrHeader"
+          >
+            <integer
+              label="进给倍率"
+              name="optimizectrlfeed"
+              v-model="strategiesItem.optimize_ctrl_feed_rate"
+              title="进给倍率(%)"
+              :rules="[
+                {
+                  validator: optimizectrlfeed
+                }
+              ]"
+            />
+            <decimal
+              label="系数"
+              name="optimizectrllearn"
+              v-model="strategiesItem.optimize_ctrl_learn_factor"
+              title="系数(.)"
+              :rules="[
+                {
+                  validator: optimizectrllearn
+                }
+              ]"
+            />
+          </van-form>
         </div>
         <div class="opt-contet">
           <div class="opt-top">
@@ -102,7 +144,38 @@
             />
           </div>
           <div class="opt-btn">
-            <div>
+            <van-form
+              colon
+              label-align="right"
+              :validate-trigger="['onChange', 'onBlur']"
+              ref="optimizectrBtn"
+            >
+              <integer
+                label="上限进给倍率"
+                name="optimizectrlmax"
+                v-model="strategiesItem.optimize_ctrl_max_feed_rate"
+                title="上限进给倍率(%)"
+                :rules="[
+                  {
+                    validator: optimizectrlmax
+                  }
+                ]"
+                :disabled="!strategiesItem.optimize_ctrl_max_feed_rate_enable ? true : false"
+              />
+              <integer
+                label="下限进给倍率"
+                name="optimizectrlmin"
+                v-model="strategiesItem.optimize_ctrl_min_feed_rate"
+                title="下限进给倍率(%)"
+                :rules="[
+                  {
+                    validator: optimizectrlmin
+                  }
+                ]"
+                :disabled="!strategiesItem.optimize_ctrl_max_feed_rate_enable ? true : false"
+              />
+            </van-form>
+            <!-- <div>
               <span>上限进给倍率:</span>
               <integer
                 v-model="strategiesItem.optimize_ctrl_max_feed_rate"
@@ -115,11 +188,11 @@
                 v-model="strategiesItem.optimize_ctrl_min_feed_rate"
                 title="下限进给倍率(%)"
               />
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
-      <div class="contact" v-if="strategyParameters === 3">
+      <div class="contact" v-show="strategyParameters === 3">
         <div class="con-header">
           <div>
             <span>启用状态</span>
@@ -130,22 +203,75 @@
               :inactive-value="0"
             />
           </div>
-          <div>
+          <van-form
+            colon
+            label-align="right"
+            :validate-trigger="['onChange', 'onBlur']"
+            ref="touchHeader"
+          >
+            <integer
+              label="进给倍率"
+              name="touchfeed"
+              v-model="strategiesItem.touch_feed_rate"
+              title="进给倍率(%)"
+              :rules="[
+                {
+                  validator: touchfeed
+                }
+              ]"
+            />
+          </van-form>
+          <!-- <div>
             <span>进给倍率:</span>
             <integer v-model="strategiesItem.touch_feed_rate" title="进给倍率(%)" />
-          </div>
+          </div> -->
         </div>
         <div class="con-contet">
-          <div>
-            <span>切入保护</span>
-            <van-switch
-              v-model="strategiesItem.touch_entry_protection_enable"
-              size="24px"
-              :active-value="1"
-              :inactive-value="0"
+          <van-form
+            colon
+            label-align="right"
+            :validate-trigger="['onChange', 'onBlur']"
+            ref="touchBtn"
+          >
+            <div class="protection">
+              <span>切入保护</span>
+              <van-switch
+                v-model="strategiesItem.touch_entry_protection_enable"
+                size="24px"
+                :active-value="1"
+                :inactive-value="0"
+              />
+            </div>
+            <integer
+              label="在生效持续时间"
+              name="touchfeed"
+              v-model="strategiesItem.touch_revival_duration"
+              title="在生效持续时间(s)"
+              :rules="[{ required: true, message: '请输入在生效持续时间' }]"
+              :disabled="!strategiesItem.touch_entry_protection_enable ? true : false"
             />
-          </div>
-          <div>
+            <integer
+              label="切入保护时间"
+              name="touchfeed"
+              v-model="strategiesItem.touch_entry_protection_time"
+              title="切入保护时间(s)"
+              :rules="[{ required: true, message: '请输入在切入保护时间' }]"
+              :disabled="!strategiesItem.touch_entry_protection_enable ? true : false"
+            />
+            <integer
+              label="接触保护倍率"
+              name="touchprotection"
+              v-model="strategiesItem.touch_protection_rate"
+              title="接触保护倍率(%)"
+              :rules="[
+                {
+                  validator: touchprotection
+                }
+              ]"
+              :disabled="!strategiesItem.touch_entry_protection_enable ? true : false"
+            />
+          </van-form>
+          <!-- <div>
             <span>在生效持续时间:</span>
             <integer v-model="strategiesItem.touch_revival_duration" title="在生效持续时间(s)" />
           </div>
@@ -156,7 +282,7 @@
           <div>
             <span>接触保护倍率:</span>
             <integer v-model="strategiesItem.touch_protection_rate" title="接触保护倍率(%)" />
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -234,7 +360,9 @@ const parameters = [
     name: '接触线'
   }
 ]
-const strategiesItem = ref({})
+const strategiesItem = ref({
+  overload_protection_feed_rate: 0
+})
 const strategiesid = ref(0)
 const strategiesFun = val => {
   strategiesid.value = val
@@ -285,42 +413,114 @@ const workpieceStrategy = async () => {
     console.log(e)
   }
 }
-
 const popoverRef = ref(null)
 const setStrategyFun = async () => {
-  strategiesItem.value.overload_protection_feed_rate =
-    strategiesItem.value.overload_protection_feed_rate / 100
-  strategiesItem.value.optimize_ctrl_feed_rate = strategiesItem.value.optimize_ctrl_feed_rate / 100
-  strategiesItem.value.optimize_ctrl_max_feed_rate =
-    strategiesItem.value.optimize_ctrl_max_feed_rate / 100
-  strategiesItem.value.optimize_ctrl_min_feed_rate =
-    strategiesItem.value.optimize_ctrl_min_feed_rate / 100
-  strategiesItem.value.touch_feed_rate = strategiesItem.value.touch_feed_rate / 100
-  strategiesItem.value.touch_protection_rate = strategiesItem.value.touch_protection_rate / 100
-  strategiesItem.value.touch_entry_protection_time =
-    strategiesItem.value.touch_entry_protection_time * 1000
-  strategiesItem.value.touch_revival_duration = strategiesItem.value.touch_revival_duration * 1000
-  try {
-    const res = await fetchPostApi(
-      {
-        version: '1.0',
-        method: 'set_strategy',
-        id: '8',
-        params: {
-          strategy_parameters: strategiesItem.value
-        }
-      },
-      'ipsbatch'
-    )
-    const data = res
-    popoverRef.value.confirmFun()
-    if (!data.result.status) proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
-    else proxy.$alertMsg('clear', '', '保存失败', { type: 'danger' })
-    workpieceStrategy()
-  } catch (e) {
-    console.log(e)
+  const promises = [
+    overload.value.validate(),
+    optimizectrHeader.value.validate(),
+    optimizectrBtn.value.validate(),
+    touchHeader.value.validate(),
+    touchBtn.value.validate()
+  ]
+  Promise.all(promises)
+    .then(async () => {
+      strategiesItem.value.overload_protection_feed_rate =
+        strategiesItem.value.overload_protection_feed_rate / 100
+      strategiesItem.value.optimize_ctrl_feed_rate =
+        strategiesItem.value.optimize_ctrl_feed_rate / 100
+      strategiesItem.value.optimize_ctrl_max_feed_rate =
+        strategiesItem.value.optimize_ctrl_max_feed_rate / 100
+      strategiesItem.value.optimize_ctrl_min_feed_rate =
+        strategiesItem.value.optimize_ctrl_min_feed_rate / 100
+      strategiesItem.value.touch_feed_rate = strategiesItem.value.touch_feed_rate / 100
+      strategiesItem.value.touch_protection_rate = strategiesItem.value.touch_protection_rate / 100
+      strategiesItem.value.touch_entry_protection_time =
+        strategiesItem.value.touch_entry_protection_time * 1000
+      strategiesItem.value.touch_revival_duration =
+        strategiesItem.value.touch_revival_duration * 1000
+      try {
+        const res = await fetchPostApi(
+          {
+            version: '1.0',
+            method: 'set_strategy',
+            id: '8',
+            params: {
+              strategy_parameters: strategiesItem.value
+            }
+          },
+          'ipsbatch'
+        )
+        const data = res
+        popoverRef.value.confirmFun()
+        if (!data.result.status) proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
+        else proxy.$alertMsg('clear', '', '保存失败', { type: 'danger' })
+        workpieceStrategy()
+      } catch (e) {
+        console.log(e)
+      }
+    })
+    .catch(() => {
+      return false
+    })
+}
+const overloadfeedrate = val => {
+  const { optimize_ctrl_feed_rate, touch_feed_rate } = strategiesItem.value
+  if (val > optimize_ctrl_feed_rate || val > touch_feed_rate) {
+    return '过载保护线不能大于优化控制线和接触线'
   }
 }
+const overloadprotection = val => {
+  const { optimize_ctrl_learn_factor } = strategiesItem.value
+  if (val < optimize_ctrl_learn_factor) {
+    return '不能小于优化控制线系数'
+  }
+}
+const optimizectrlfeed = val => {
+  const { overload_protection_feed_rate, touch_feed_rate } = strategiesItem.value
+  if (val < overload_protection_feed_rate || val > touch_feed_rate) {
+    return '优化控制线不能小于过载保护线和大于接触线'
+  }
+}
+const optimizectrllearn = val => {
+  const { overload_protection_learn_factor } = strategiesItem.value
+  if (val > overload_protection_learn_factor) {
+    return '不能大于过载保护线系数'
+  }
+}
+const optimizectrlmax = val => {
+  const { optimize_ctrl_feed_rate, optimize_ctrl_min_feed_rate } = strategiesItem.value
+  if (val < optimize_ctrl_feed_rate) {
+    return '不能小于进给倍率'
+  } else if (val < optimize_ctrl_min_feed_rate) {
+    return '不能小于下限进给倍率'
+  }
+}
+const optimizectrlmin = val => {
+  const { optimize_ctrl_feed_rate, optimize_ctrl_max_feed_rate } = strategiesItem.value
+  if (val > optimize_ctrl_feed_rate) {
+    return '不能大于进给倍率'
+  } else if (val > optimize_ctrl_max_feed_rate) {
+    return '不能大于上限进给倍率'
+  }
+}
+const touchfeed = val => {
+  const { optimize_ctrl_feed_rate, overload_protection_feed_rate } = strategiesItem.value
+  if (val < optimize_ctrl_feed_rate || val < overload_protection_feed_rate) {
+    return '接触线不能小于过载保护线和优化控制线'
+  }
+}
+const touchprotection = val => {
+  const { touch_feed_rate } = strategiesItem.value
+  if (val > touch_feed_rate) {
+    return '不能大于进给倍率'
+  }
+}
+
+const overload = ref(null)
+const optimizectrHeader = ref(null)
+const optimizectrBtn = ref(null)
+const touchHeader = ref(null)
+const touchBtn = ref(null)
 </script>
 
 <style lang="scss" scoped>
@@ -391,12 +591,9 @@ const setStrategyFun = async () => {
   .content {
     background-color: rgb(241, 241, 241);
     height: 308px;
-    // padding: 16px 0 0 24px;
+    padding: 16px 0 0 24px;
+
     .overload {
-      :deep(.van-cell) {
-        width: 250px;
-        margin-right: 8px;
-      }
       display: flex;
       height: 96px;
       align-items: center;
@@ -410,12 +607,51 @@ const setStrategyFun = async () => {
           margin-right: 8px;
         }
       }
+      :deep(.van-form) {
+        display: flex;
+        font-size: 24px;
+        .van-cell {
+          position: relative;
+          padding: 0;
+          border: 0;
+          font-size: 24px;
+          background: transparent;
+          overflow: visible;
+          margin-right: 24px;
+        }
+        .van-cell__title {
+          width: auto;
+          font-size: 24px;
+        }
+        :deep(.van-field__label) {
+          line-height: 64px;
+        }
+        input {
+          width: 250px;
+          padding: 0 12px;
+          height: 64px;
+          line-height: 64px;
+          background: #fff;
+          border-radius: 4px;
+          border: 1px solid #dcdfe6;
+          &:disabled {
+            background: rgb(224, 224, 224);
+          }
+        }
+      }
+      :deep(.van-field .van-field__value) {
+        position: relative;
+        left: 0;
+        top: 0;
+
+        .van-field__error-message {
+          // top: 0;
+          position: absolute;
+          font-size: 16px;
+        }
+      }
     }
     .optimize {
-      :deep(.van-cell) {
-        width: 250px;
-        margin-right: 8px;
-      }
       .opt-header {
         display: flex;
         height: 96px;
@@ -430,6 +666,49 @@ const setStrategyFun = async () => {
           margin-right: 40px;
           span {
             margin-right: 8px;
+          }
+        }
+        :deep(.van-form) {
+          display: flex;
+          font-size: 24px;
+          .van-cell {
+            position: relative;
+            padding: 0;
+            border: 0;
+            font-size: 24px;
+            background: transparent;
+            overflow: visible;
+            margin-right: 20px;
+          }
+          .van-cell__title {
+            width: auto;
+            font-size: 24px;
+          }
+          :deep(.van-field__label) {
+            line-height: 64px;
+          }
+          input {
+            width: 250px;
+            padding: 0 12px;
+            height: 64px;
+            line-height: 64px;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #dcdfe6;
+            &:disabled {
+              background: rgb(224, 224, 224);
+            }
+          }
+        }
+        :deep(.van-field .van-field__value) {
+          position: relative;
+          left: 0;
+          top: 0;
+
+          .van-field__error-message {
+            // top: 0;
+            position: absolute;
+            font-size: 16px;
           }
         }
       }
@@ -455,6 +734,49 @@ const setStrategyFun = async () => {
               margin-right: 8px;
             }
           }
+          :deep(.van-form) {
+            display: flex;
+            font-size: 24px;
+            .van-cell {
+              position: relative;
+              padding: 0;
+              border: 0;
+              font-size: 24px;
+              background: transparent;
+              overflow: visible;
+              margin-right: 20px;
+            }
+            .van-cell__title {
+              width: auto;
+              font-size: 24px;
+            }
+            :deep(.van-field__label) {
+              line-height: 64px;
+            }
+            input {
+              width: 250px;
+              padding: 0 12px;
+              height: 64px;
+              line-height: 64px;
+              background: #fff;
+              border-radius: 4px;
+              border: 1px solid #dcdfe6;
+              &:disabled {
+                background: rgb(224, 224, 224);
+              }
+            }
+          }
+          :deep(.van-field .van-field__value) {
+            position: relative;
+            left: 0;
+            top: 0;
+
+            .van-field__error-message {
+              // top: 0;
+              position: absolute;
+              font-size: 16px;
+            }
+          }
         }
       }
     }
@@ -465,10 +787,10 @@ const setStrategyFun = async () => {
         align-items: center;
         border-bottom: 2px solid rgb(225, 225, 225);
         padding-left: 24px;
-        :deep(.van-cell) {
-          width: 250px;
-          margin-right: 8px;
-        }
+        // :deep(.van-cell) {
+        //   width: 250px;
+        //   margin-right: 8px;
+        // }
         & > div {
           height: 64px;
           display: flex;
@@ -477,6 +799,49 @@ const setStrategyFun = async () => {
           margin-right: 40px;
           span {
             margin-right: 8px;
+          }
+        }
+        :deep(.van-form) {
+          display: flex;
+          font-size: 24px;
+          .van-cell {
+            position: relative;
+            padding: 0;
+            border: 0;
+            font-size: 24px;
+            background: transparent;
+            overflow: visible;
+            margin-right: 20px;
+          }
+          .van-cell__title {
+            width: auto;
+            font-size: 24px;
+          }
+          :deep(.van-field__label) {
+            line-height: 64px;
+          }
+          input {
+            width: 250px;
+            padding: 0 12px;
+            height: 64px;
+            line-height: 64px;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #dcdfe6;
+            &:disabled {
+              background: rgb(224, 224, 224);
+            }
+          }
+        }
+        :deep(.van-field .van-field__value) {
+          position: relative;
+          left: 0;
+          top: 0;
+
+          .van-field__error-message {
+            // top: 0;
+            position: absolute;
+            font-size: 16px;
           }
         }
       }
@@ -494,23 +859,76 @@ const setStrategyFun = async () => {
             margin-right: 8px;
           }
         }
-        & > :nth-child(2) {
-          :deep(.van-cell) {
+        // & > :nth-child(2) {
+        //   :deep(.van-cell) {
+        //     width: 180px;
+        //     margin-right: 8px;
+        //   }
+        // }
+        // & > :nth-child(3) {
+        //   :deep(.van-cell) {
+        //     width: 180px;
+        //     margin-right: 8px;
+        //   }
+        // }
+        // & > :last-child {
+        //   margin-top: 16px;
+        //   :deep(.van-cell) {
+        //     width: 203px;
+        //     margin-right: 8px;
+        //   }
+        // }
+        :deep(.van-form) {
+          display: flex;
+          font-size: 24px;
+          flex-wrap: wrap;
+          align-items: center;
+          .protection {
+            display: flex;
+            align-items: center;
+            margin-right: 40px;
+            span {
+              margin-right: 8px;
+            }
+          }
+          .van-cell {
+            position: relative;
+            padding: 0;
+            border: 0;
+            font-size: 24px;
+            background: transparent;
+            overflow: visible;
+            margin-right: 20px;
+          }
+          .van-cell__title {
+            width: auto;
+            font-size: 24px;
+          }
+          :deep(.van-field__label) {
+            line-height: 64px;
+          }
+          input {
             width: 180px;
-            margin-right: 8px;
+            padding: 0 12px;
+            height: 64px;
+            line-height: 64px;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #dcdfe6;
+            &:disabled {
+              background: rgb(224, 224, 224);
+            }
           }
         }
-        & > :nth-child(3) {
-          :deep(.van-cell) {
-            width: 180px;
-            margin-right: 8px;
-          }
-        }
-        & > :last-child {
-          margin-top: 16px;
-          :deep(.van-cell) {
-            width: 203px;
-            margin-right: 8px;
+        :deep(.van-field .van-field__value) {
+          position: relative;
+          left: 0;
+          top: 0;
+
+          .van-field__error-message {
+            // top: 0;
+            position: absolute;
+            font-size: 16px;
           }
         }
       }
