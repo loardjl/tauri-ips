@@ -231,15 +231,18 @@ const handleConnect = async () => {
     })
   }
   popoverRef.value.cancelFun()
+  setTimeout(() => {
+    getList()
+  }, 200)
 
   // 改变列表连接状态
-  for (const val of tableData.value) {
-    if (val.id === id) {
-      val.connect_status = !connect_status
-      val.connect_status_name = !connect_status ? '已连接' : '未连接'
-      break
-    }
-  }
+  // for (const val of tableData.value) {
+  //   if (val.id === id) {
+  //     val.connect_status = !connect_status
+  //     val.connect_status_name = !connect_status ? '已连接' : '未连接'
+  //     break
+  //   }
+  // }
 }
 const popDeleteRef = ref()
 // 删除
