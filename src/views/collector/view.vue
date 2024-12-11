@@ -81,14 +81,18 @@
     <div class="view" v-if="tabSelected === 2">
       <van-form colon label-align="right" label-width="168" ref="controlFormRef">
         <div class="conbine-input flex-start">
-          <van-field
-            v-model="controlOnOff.ctrl_addr_type_name"
-            is-link
-            readonly
-            label="控制开关地址"
-            placeholder="请选择"
-            @click="showControlPicker(1)"
-          />
+          <van-field label="控制开关地址">
+            <template #input>
+              <van-field
+                v-model="controlOnOff.ctrl_addr_type_name"
+                is-link
+                readonly
+                placeholder="请选择"
+                @click="showControlPicker(1)"
+              />
+            </template>
+          </van-field>
+
           <van-field
             v-model="controlOnOff.ctrl_addr"
             name=""
@@ -110,14 +114,18 @@
           <van-field v-model="controlSpeed.ctrl_addr" name="" label="" placeholder="请输入" :rules="[{ required: true, message: '请输入' }]" />
         </div> -->
         <div class="conbine-input flex-start">
-          <van-field
-            v-model="controlFeed.ctrl_addr_type_name"
-            is-link
-            readonly
-            label="控制进给地址"
-            placeholder="请选择"
-            @click="showControlPicker(3)"
-          />
+          <van-field label="控制进给地址">
+            <template #input>
+              <van-field
+                v-model="controlFeed.ctrl_addr_type_name"
+                is-link
+                readonly
+                placeholder="请选择"
+                @click="showControlPicker(3)"
+              />
+            </template>
+          </van-field>
+
           <van-field
             v-model="controlFeed.ctrl_addr"
             name=""
