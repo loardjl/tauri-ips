@@ -59,6 +59,18 @@
           background: rgb(224, 224, 224);
         }
       }
+      .van-cell{
+        width:100%;
+        padding-bottom:0;
+      }
+    }
+    
+    .van-field--disabled{
+      :deep(.van-field__body){
+        &::after{
+          opacity: 0.2;
+        }
+      }
     }
 
     :deep(.van-cell--clickable) {

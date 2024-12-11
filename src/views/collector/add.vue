@@ -16,24 +16,31 @@
           maxlength="20"
           :rules="[{ required: true, message: '请输入采集器名称' }]"
         />
-        <van-field
-          v-model="ruleForm.maker_text"
-          name="maker_text"
-          is-link
-          readonly
-          label="设备厂家"
-          placeholder="请选择"
-          @click="showPickerFn('maker')"
-        />
-        <van-field
-          v-model="ruleForm.hardware_text"
-          name="hardware_text"
-          is-link
-          readonly
-          label="型号"
-          placeholder="请选择"
-          @click="showPickerFn('hardware')"
-        />
+        <van-field label="设备厂家">
+          <template #input>
+            <van-field
+              v-model="ruleForm.maker_text"
+              name="maker_text"
+              is-link
+              readonly
+              placeholder="请选择"
+              @click="showPickerFn('maker')"
+            />
+          </template>
+        </van-field>
+        <van-field label="型号">
+          <template #input>
+            <van-field
+              v-model="ruleForm.hardware_text"
+              name="hardware_text"
+              is-link
+              readonly
+              placeholder="请选择"
+              @click="showPickerFn('hardware')"
+            />
+          </template>
+        </van-field>
+
         <van-field
           v-model="ruleForm.ip"
           name="ip"

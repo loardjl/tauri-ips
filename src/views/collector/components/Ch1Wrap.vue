@@ -4,11 +4,11 @@
       <van-form colon label-align="right" label-width="180">
         <template v-for="child in signalsListItem" :key="child.sig_id + child.addr_type">
           <div class="conbine-input flex-start">
+            <div class="label">{{ child.display_name }}:</div>
             <van-field
               v-model="collectTypesObj[child.addr_type]"
               is-link
               readonly
-              :label="child.display_name"
               placeholder="请选择"
               @click="handleShowPicker(child)"
             />
@@ -308,6 +308,13 @@ onMounted(() => {
 @import '../style.scss';
 .conbine-input {
   width: 50%;
+  .label {
+    width: 180px;
+    margin: 0 12px 24px 0;
+    text-align: right;
+    color: rgb(50, 50, 51);
+    flex-shrink: 0;
+  }
   :deep(.van-cell) {
     width: auto !important;
     .van-cell__value {

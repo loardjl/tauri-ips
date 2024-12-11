@@ -1,7 +1,7 @@
 <template>
   <div class="number-input">
     <VanButton type="primary" @click="sub">-</VanButton>
-    <VanField v-model="inputValue" v-limitInput:num="[min, max]"></VanField>
+    <VanField v-model="inputValue" v-limitInput:num="[min, max]" :disabled="isDisabled"></VanField>
     <VanButton type="primary" @click="add">+</VanButton>
   </div>
 </template>
@@ -20,6 +20,10 @@ const props = defineProps({
   min: {
     type: Number,
     default: 1
+  },
+  isDisabled: {
+    type: Boolean,
+    default: false
   }
 })
 const inputValue = computed({
@@ -28,12 +32,12 @@ const inputValue = computed({
 })
 const emit = defineEmits(['update:modelValue', 'input'])
 const add = () => {
-  if (inputValue.value < props.max) {
+  if (inputValue.value < props.max && !props.isDisabled) {
     inputValue.value = Number(inputValue.value) + 1
   }
 }
 const sub = () => {
-  if (inputValue.value > props.min) {
+  if (inputValue.value > props.min && !props.isDisabled) {
     inputValue.value = Number(inputValue.value) - 1
   }
 }

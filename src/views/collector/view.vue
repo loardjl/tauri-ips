@@ -20,15 +20,19 @@
           </div>
         </div>
         <div class="form-block flex-start mt24">
-          <van-field
-            v-model="detailData.maker_text"
-            name="maker_text"
-            is-link
-            readonly
-            label="设备厂家"
-            placeholder="请选择"
-            @click="showPickerFn('maker')"
-          />
+          <van-field label="设备厂家">
+            <template #input>
+              <van-field
+                v-model="detailData.maker_text"
+                name="maker_text"
+                is-link
+                readonly
+                placeholder="请选择"
+                @click="showPickerFn('maker')"
+                disabled
+              />
+            </template>
+          </van-field>
           <van-field
             v-model="detailData.ip"
             name="ip"
@@ -36,18 +40,23 @@
             placeholder="请输入"
             :rules="[{ pattern: ipReg, message: '请输入正确的IP地址' }]"
           />
-          <van-field
-            v-model="detailData.hardware_text"
-            name="hardware_text"
-            is-link
-            readonly
-            label="型号"
-            placeholder="请选择"
-            @click="showPickerFn('hardware')"
-          />
+          <van-field label="型号">
+            <template #input>
+              <van-field
+                v-model="detailData.hardware_text"
+                name="hardware_text"
+                is-link
+                readonly
+                placeholder="请选择"
+                @click="showPickerFn('hardware')"
+                disabled
+              />
+            </template>
+          </van-field>
+
           <van-field name="path_num" label="通道数">
             <template #input>
-              <numberInput v-model="detailData.path_num" :min="1" :max="9" />
+              <numberInput v-model="detailData.path_num" :min="1" :max="9" isDisabled />
             </template>
           </van-field>
           <van-field
@@ -666,7 +675,7 @@ const getDevList = async () => {
   for (const item of machineDetailList.value) {
     if (item.dev_info.dev_id === devId.value && item.dev_info.dev_type === 'ARM') {
       for (const val of item.adapter_info_list) {
-        curAdapter = adapterIds.find(d => +d === val.adapter_info.id)
+        curAdapter = +adapterIds.find(d => +d === val.adapter_info.id)
         if (curAdapter) {
           machineDetail.value.push({
             ...val,
