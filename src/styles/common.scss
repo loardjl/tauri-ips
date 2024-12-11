@@ -63,6 +63,13 @@ $base-error-color: rgb(252, 12, 3);
   align-items: center;
 }
 
+.line1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all
+}
+
 .font24 {
   font-size: 24px;
   font-weight: 400;

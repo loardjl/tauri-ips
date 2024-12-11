@@ -13,6 +13,7 @@
           name="name"
           label="采集器名称"
           placeholder="请输入"
+          maxlength="20"
           :rules="[{ required: true, message: '请输入采集器名称' }]"
         />
         <van-field
@@ -46,7 +47,7 @@
           label="端口号"
           type="digit"
           placeholder="请输入"
-          :rules="[{ required: true, message: '请输入端口号' }]"
+          :rules="[{ required: true, message: '请输入端口号' }, { validator: portValidator }]"
         />
         <van-field name="path_num" label="通道数">
           <template #input>
@@ -87,7 +88,7 @@ const { asideList } = storeToRefs(menuStore)
 import { useSysStore } from '@src/store/useSys'
 const sysStore = useSysStore()
 const { devId } = storeToRefs(sysStore)
-import { ipReg } from '@src/utils/validate.js'
+import { ipReg, portValidator } from '@src/utils/validate.js'
 import numberInput from '@components/common/numberInput/index.vue'
 import popover from '@components/common/popover/inedx.vue'
 import myTabs from '@components/common/myTabs/index.vue'

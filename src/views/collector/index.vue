@@ -12,7 +12,7 @@
           <div class="left flex-start">
             <img src="@src/assets/icons/svg/connect2.svg" alt="" v-if="item.connect_status" />
             <img src="@src/assets/icons/svg/connect1.svg" alt="" v-else />
-            <div class="ml9">{{ item.name }}</div>
+            <div class="ml9 line1 name">{{ item.name }}</div>
           </div>
           <div class="right flex-center">{{ filterCollectorType(item.collector_type_id) }}</div>
         </div>
@@ -273,6 +273,7 @@ const handleDelete = async () => {
     })
   }
   popDeleteRef.value.cancelFun()
+  removeSelect()
   getList()
   // type为0表示是ips的信号；type为1表示是过载的信号
   // await delSignalNode({ type: 0, deleteData: [{ adapter_id: row.id }] }).then(res => {
@@ -453,6 +454,9 @@ onBeforeUnmount(async () => {
       font-size: 24px;
       font-weight: 600;
       color: rgba(52, 52, 52, 0.3);
+    }
+    .name {
+      width: 180px;
     }
     .right {
       width: 64px;

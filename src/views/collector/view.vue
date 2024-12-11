@@ -6,10 +6,11 @@
         <div class="header-con flex-start">
           <van-field
             v-model="detailData.name"
-            name="采集器名称"
+            name="name"
             label="采集器名称"
             placeholder="请输入"
-            :rules="[{ required: true, message: '请输入' }]"
+            maxlength="20"
+            :rules="[{ required: true, message: '请输入采集器名称' }]"
           />
           <div class="ml40 mb24">采集器类型：{{ collectorTypeName }}</div>
           <div class="ml40 mb24 flex-start">
@@ -55,7 +56,7 @@
             label="端口号"
             type="digit"
             placeholder="请输入"
-            :rules="[{ required: true, message: '请输入端口号' }]"
+            :rules="[{ required: true, message: '请输入端口号' }, { validator: portValidator }]"
           />
           <van-field
             v-model="detailData.freq"
@@ -188,7 +189,7 @@ const { signal } = useSignalController()
 const _worker = inject('_worker')
 import { useStoreSignal } from '@src/store/useSignals'
 const storeSignal = useStoreSignal()
-import { ipReg } from '@src/utils/validate.js'
+import { ipReg, portValidator } from '@src/utils/validate.js'
 import { dccDevNcCheckRun, controlList } from '@src/utils/enum'
 import { _public } from '@src/utils/common'
 import { useRoute } from 'vue-router'
@@ -458,7 +459,7 @@ const setRateCtrlParams = async () => {
       adapter_rate_ctrl_params: params
     }
   })
-  if (res.result.params) {
+  if (res.result.adapter_id) {
     proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
   } else {
     proxy.$alertMsg('clear', '', '保存失败', { type: 'danger' })
