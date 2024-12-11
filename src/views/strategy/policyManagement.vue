@@ -360,9 +360,7 @@ const parameters = [
     name: '接触线'
   }
 ]
-const strategiesItem = ref({
-  overload_protection_feed_rate: 0
-})
+const strategiesItem = ref({})
 const strategiesid = ref(0)
 const strategiesFun = val => {
   strategiesid.value = val
@@ -392,7 +390,6 @@ const workpieceStrategy = async () => {
       'ipsbatch'
     )
     const data = res
-
     data.result.strategies.forEach(item => {
       item.optimize_ctrl_learn_factor = item.optimize_ctrl_learn_factor.toFixed(1)
       item.overload_protection_learn_factor = item.overload_protection_learn_factor.toFixed(1)
@@ -424,20 +421,20 @@ const setStrategyFun = async () => {
   ]
   Promise.all(promises)
     .then(async () => {
-      strategiesItem.value.overload_protection_feed_rate =
-        strategiesItem.value.overload_protection_feed_rate / 100
-      strategiesItem.value.optimize_ctrl_feed_rate =
-        strategiesItem.value.optimize_ctrl_feed_rate / 100
-      strategiesItem.value.optimize_ctrl_max_feed_rate =
-        strategiesItem.value.optimize_ctrl_max_feed_rate / 100
-      strategiesItem.value.optimize_ctrl_min_feed_rate =
-        strategiesItem.value.optimize_ctrl_min_feed_rate / 100
-      strategiesItem.value.touch_feed_rate = strategiesItem.value.touch_feed_rate / 100
-      strategiesItem.value.touch_protection_rate = strategiesItem.value.touch_protection_rate / 100
-      strategiesItem.value.touch_entry_protection_time =
-        strategiesItem.value.touch_entry_protection_time * 1000
-      strategiesItem.value.touch_revival_duration =
-        strategiesItem.value.touch_revival_duration * 1000
+      const copystrategiesItem = JSON.parse(JSON.stringify(strategiesItem.value))
+      console.log(copystrategiesItem)
+      copystrategiesItem.overload_protection_feed_rate =
+        copystrategiesItem.overload_protection_feed_rate / 100
+      copystrategiesItem.optimize_ctrl_feed_rate = copystrategiesItem.optimize_ctrl_feed_rate / 100
+      copystrategiesItem.optimize_ctrl_max_feed_rate =
+        copystrategiesItem.optimize_ctrl_max_feed_rate / 100
+      copystrategiesItem.optimize_ctrl_min_feed_rate =
+        copystrategiesItem.optimize_ctrl_min_feed_rate / 100
+      copystrategiesItem.touch_feed_rate = copystrategiesItem.touch_feed_rate / 100
+      copystrategiesItem.touch_protection_rate = copystrategiesItem.touch_protection_rate / 100
+      copystrategiesItem.touch_entry_protection_time =
+        copystrategiesItem.touch_entry_protection_time * 1000
+      copystrategiesItem.touch_revival_duration = copystrategiesItem.touch_revival_duration * 1000
       try {
         const res = await fetchPostApi(
           {
@@ -445,7 +442,7 @@ const setStrategyFun = async () => {
             method: 'set_strategy',
             id: '8',
             params: {
-              strategy_parameters: strategiesItem.value
+              strategy_parameters: copystrategiesItem
             }
           },
           'ipsbatch'

@@ -5,7 +5,7 @@
       :name="name"
       v-model="inputValue"
       readonly
-      type="digit"
+      type="number"
       @click="showPicker = true"
       :rules="rules"
     />
