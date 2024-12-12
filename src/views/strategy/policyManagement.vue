@@ -250,7 +250,7 @@
               :rules="[{ required: true, message: '请输入在生效持续时间' }]"
               :disabled="!strategiesItem.touch_entry_protection_enable ? true : false"
             />
-            <integer
+            <decimal
               label="切入保护时间"
               name="touchfeed"
               v-model="strategiesItem.touch_entry_protection_time"

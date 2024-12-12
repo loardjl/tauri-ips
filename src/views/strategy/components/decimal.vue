@@ -8,6 +8,7 @@
       type="number"
       @click="showPicker = true"
       :rules="rules"
+      :disabled="disabled"
     />
     <van-popup v-model:show="showPicker" round position="bottom">
       <van-picker
@@ -44,6 +45,10 @@ const props = defineProps({
   },
   rules: {
     type: Array
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 
