@@ -151,6 +151,12 @@ const getList = async () => {
   tableIndex = 0
   tempTableData = res.result.adapter_list
   tempTableData.length && (await getAdapterStatus(res.result.adapter_list[0]))
+  const newColllectId = sessionStorage.getItem('newColllectId')
+  const temp = tableData.value.find(item => JSON.stringify(item.ids) === newColllectId)
+  if (temp) {
+    selectedCollector(temp)
+  }
+  sessionStorage.removeItem('newColllectId')
   adapterList.value = tableData.value
 }
 

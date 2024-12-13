@@ -505,6 +505,7 @@ const handleSave = async () => {
           if (isConnect) {
             proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
             setTimeout(() => {
+              sessionStorage.setItem('newColllectId', JSON.stringify(tempAddId))
               history.back(-1)
             }, 50)
           } else {
