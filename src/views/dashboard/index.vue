@@ -139,6 +139,7 @@ onMounted(() => {
       key: 'relearn',
       sort: 0,
       text: '重新学习',
+      disable: computed(() => (realtimeInfo.value.program_number === '' ? true : false)),
       cb: () => {
         relearnFun()
       },
