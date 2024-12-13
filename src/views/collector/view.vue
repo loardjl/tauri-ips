@@ -151,6 +151,7 @@
         :signalsListItem="signalsListCH"
         :curAdapterId="curAdapter"
         :tabType="tabSelected"
+        @reloadNC="reloadNC"
       />
     </div>
     <div class="view" v-if="tabSelected === 4">
@@ -160,6 +161,7 @@
         :signalsListItem="signalsListExtend"
         :curAdapterId="curAdapter"
         :tabType="tabSelected"
+        @reloadNC="reloadNC"
       />
     </div>
     <van-popup v-model:show="showPicker" round position="bottom">
@@ -818,6 +820,13 @@ const subscribeRealTime = async () => {
     type: 'startPushData',
     payload: {}
   })
+}
+// 刷新NC实时信息指标
+const reloadNC = async () => {
+  await unsubscribeRealTime()
+  storeSignal.changeSignalList(null)
+  // 订阅实时数据
+  getRealTime()
 }
 // 停止订阅实时数据
 const unsubscribeRealTime = async () => {

@@ -2,7 +2,7 @@
   <div class="ch1-wrap">
     <div v-if="isEdit">
       <van-form colon label-align="right" label-width="180">
-        <template v-for="child in signalsListItem" :key="child.sig_id + child.addr_type">
+        <template v-for="child in signalsListItemForm" :key="child.sig_id + child.addr_type">
           <div class="conbine-input flex-start">
             <div class="label">{{ child.display_name }}:</div>
             <van-field
@@ -27,7 +27,7 @@
       <template v-for="(child, i) in signalsListItem" :key="i">
         <div class="item">
           <div class="label">{{ child.display_name }}：</div>
-          <div class="value">{{ child.realTimeData.val[0] }}</div>
+          <div class="value">{{ child.realTimeData?.val[0] }}</div>
         </div>
       </template>
     </div>
@@ -45,7 +45,8 @@
 </template>
 
 <script setup lang="jsx">
-import { ref, watch, onMounted, inject } from 'vue'
+import { ref, watch, onMounted, inject, getCurrentInstance } from 'vue'
+const { proxy } = getCurrentInstance()
 import { storeToRefs } from 'pinia'
 import popover from '@components/common/popover/inedx.vue'
 import { collectTypes, collectTypesObj } from '@src/utils/enum'
@@ -75,6 +76,7 @@ const props = defineProps({
     type: [String, Number]
   }
 })
+const emit = defineEmits(['reloadNC'])
 
 const curSignal = ref({})
 const curPicker = ref([0])
@@ -145,11 +147,14 @@ const getDevList = async () => {
   // tempSignalForm.value.tempSignal = tempSignal.value
 }
 const findEditFields = () => {
-  // console.log(9999888, copyTempSignal, props.signalsListItem)
   const result = []
   copyTempSignal.forEach(old => {
-    props.signalsListItem.forEach(cur => {
-      if (old.sig_id === cur.sig_id && !_public._equals(cur, old)) {
+    signalsListItemForm.value.forEach(cur => {
+      // if (old.sig_id === cur.sig_id && !_public._equals(cur, old)) {
+      if (
+        old.sig_id === cur.sig_id &&
+        !(old.addr_type === cur.addr_type && old.addr === cur.addr)
+      ) {
         result.push(cur)
       }
     })
@@ -164,7 +169,7 @@ const handleSave = async () => {
       if ((val.addr && val.addr_type !== 0) || (!val.addr && val.addr_type !== 3)) {
         const tempId = pathNumList.value.filter(item => item.id === val.id)[0].id
 
-        console.log(222222, arr, val, tempId)
+        // console.log(222222, arr, val, tempId)
         await fetchPostApi({
           version: '1.0',
           method: 'set_signal_info',
@@ -182,22 +187,26 @@ const handleSave = async () => {
         })
       }
     }
+    popoverRef.value.cancelFun()
+    proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
+    isEdit.value = false
+    emit('reloadNC')
   } catch {
+    proxy.$alertMsg('clear', '', '保存失败', { type: 'danger' })
     // loading.close()
   }
   // emit('reloadNC')
   // loading.close()
   // ElMessage.success(t('collector.operateSuccess'))
   // emit('update:isEditField', false)
-
-  popoverRef.value.cancelFun()
-  isEdit.value = false
 }
 
+const signalsListItemForm = ref([])
 watch(
   () => isEdit.value,
   val => {
     if (val) {
+      signalsListItemForm.value = JSON.parse(JSON.stringify(props.signalsListItem))
       asideList.value = [
         {
           key: 'back',
