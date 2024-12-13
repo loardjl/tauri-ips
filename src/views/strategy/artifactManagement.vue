@@ -163,6 +163,7 @@ const accruedFun = async () => {
       )
       const data = res
       popoverRef.value.confirmFun()
+      getworkpiecemanager()
       if (!data.result.status) proxy.$alertMsg('checked', '', '重新累计成功', { type: 'success' })
       else proxy.$alertMsg('clear', '', '重新累计失败', { type: 'danger' })
     } catch (e) {
@@ -202,6 +203,7 @@ const deleteFun = async () => {
       )
       const data = res
       popoverDelRef.value.confirmFun()
+      getworkpiecemanager()
       if (!data.result.status) proxy.$alertMsg('checked', '', '删除成功', { type: 'success' })
       else proxy.$alertMsg('clear', '', '删除失败', { type: 'danger' })
     } catch (e) {

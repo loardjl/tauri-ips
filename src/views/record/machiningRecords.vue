@@ -81,6 +81,7 @@ onMounted(() => {
             program_name: parameter.program_name
           }
         })
+        sessionStorage.setItem('machiningPage', JSON.stringify(startPage.value))
       }
     },
     {
@@ -102,6 +103,7 @@ onMounted(() => {
       }
     }
   ]
+  startPage.value = JSON.parse(sessionStorage.getItem('machiningPage'))
   workpiece_history()
 })
 const workpiece_history = async () => {

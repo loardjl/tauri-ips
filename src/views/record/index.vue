@@ -96,6 +96,7 @@ onMounted(() => {
             }
           }
         })
+        sessionStorage.removeItem('machiningPage')
       }
     },
     {

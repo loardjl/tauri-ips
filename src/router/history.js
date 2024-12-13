@@ -17,6 +17,7 @@ const historyRoute = [
       if (!result) {
         sessionStorage.removeItem('record_program_num')
         sessionStorage.removeItem('record_program_dateTiem')
+        sessionStorage.removeItem('machiningPage')
       }
       next()
     }
