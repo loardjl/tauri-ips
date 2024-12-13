@@ -422,7 +422,6 @@ const setStrategyFun = async () => {
   Promise.all(promises)
     .then(async () => {
       const copystrategiesItem = JSON.parse(JSON.stringify(strategiesItem.value))
-      console.log(copystrategiesItem)
       copystrategiesItem.overload_protection_feed_rate =
         copystrategiesItem.overload_protection_feed_rate / 100
       copystrategiesItem.optimize_ctrl_feed_rate = copystrategiesItem.optimize_ctrl_feed_rate / 100
@@ -449,6 +448,7 @@ const setStrategyFun = async () => {
         )
         const data = res
         popoverRef.value.confirmFun()
+        strategiesItem.value = {}
         if (!data.result.status) proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
         else proxy.$alertMsg('clear', '', '保存失败', { type: 'danger' })
         workpieceStrategy()
