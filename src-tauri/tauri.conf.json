@@ -44,9 +44,18 @@
         "fullscreen": false,
         "resizable": false,
         "decorations": true,
-        "visible": true,
+        "visible": false,
         "width": 1280,
         "height": 800
+      },
+      {
+        "width": 400,
+        "height": 600,
+        "resizable": false,
+        "decorations": false,
+        "url": "../loader.html",
+        "label": "loading",
+        "center": true
       }
     ]
   }
