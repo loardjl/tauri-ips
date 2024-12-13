@@ -1,7 +1,6 @@
 use crate::msg_type::{
     get_msg, get_process_mode, parse_protocol_header, MsgType, ProcessingMode, ProtocolHeader,
 };
-use crate::nc_signal::NcSignalManager;
 use bincode::Options;
 use futures_util::lock::Mutex;
 use serde::{Deserialize, Serialize};
@@ -283,7 +282,7 @@ async fn process_data_segment(
     }
 
     let data_bytes = &leftover[pos + 15..total_len];
-    println!("data_bytes: {:?}", data_bytes);
+    // println!("data_bytes: {:?}", data_bytes);
 
     // 根据处理模式进行不同的处理
     match processing_mode {

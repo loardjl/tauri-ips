@@ -74,6 +74,8 @@ const login = async () => {
   if (res === 'success') {
     sysInfo.value.role = 'admin'
     password.value = ''
+    showLogin.value = false
+    proxy.$alertMsg('check', '', '登录成功', { type: 'success' })
   } else {
     proxy.$alertMsg('clear', '', '密码错误', { type: 'danger' })
   }
@@ -83,6 +85,8 @@ const logOut = async () => {
   const res = await invoke('change_role', { data: { role: 'user', password: '' } })
   if (res === 'success') {
     sysInfo.value.role = ''
+    showLogin.value = false
+    proxy.$alertMsg('check', '', '登出成功', { type: 'success' })
   }
 }
 

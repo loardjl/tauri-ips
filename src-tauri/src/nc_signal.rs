@@ -177,7 +177,7 @@ impl NcSignal {
     }
 }
 
-pub fn set_nc_signal_val(realtime_data: &mut HashMap<u32, NcSignalVal>, result: NcSignal) {
+pub async fn set_nc_signal_val(realtime_data: &mut HashMap<u32, NcSignalVal>, result: NcSignal) {
     let collector_id = result.collector_id;
 
     // 初始化采集器的数据存储

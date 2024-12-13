@@ -703,7 +703,7 @@ const getDevList = async () => {
   }
 
   detailData.value.path_num = pathNumList.value.length
-
+  unsubscribeRealTime()
   // 订阅实时数据
   getRealTime()
 }
@@ -726,64 +726,59 @@ const signalsListExtend = computed(() => {
 const getRealTime = async callback => {
   // ----------------- 获取采集器信号列表
   signalsList.value = []
-  if (Array.isArray(storeSignal.signalEnumList) && storeSignal.signalEnumList.length > 0) {
-    // 如果内存有采集器信号，直接获取
-    signalsList.value = JSON.parse(sessionStorage.getItem('signalEnumList'))
-  } else {
-    // 获取信号详情（包括采集方式地址等等）
-    const path_num = detailData.value.path_num || 1
-    for (let i = 0; i < path_num; i++) {
-      // 采集器id
-      const tempId = pathNumList.value.filter(child => +child.path_num === i + 1)[0].id
+  // 获取信号详情（包括采集方式地址等等）
+  const path_num = detailData.value.path_num || 1
+  for (let i = 0; i < path_num; i++) {
+    // 采集器id
+    const tempId = pathNumList.value.filter(child => +child.path_num === i + 1)[0].id
 
-      const resSignalDetail = await fetchPostApi({
-        version: '1.0',
-        method: 'enum_collector_detail_signal_info',
-        id: '68',
-        params: {
-          dev_id: devId.value,
-          adapter_id: parseInt(tempId)
-        }
-      })
-      signalsList.value.push(resSignalDetail.result.signal_info_list)
+    const resSignalDetail = await fetchPostApi({
+      version: '1.0',
+      method: 'enum_collector_detail_signal_info',
+      id: '68',
+      params: {
+        dev_id: devId.value,
+        adapter_id: parseInt(tempId)
+      }
+    })
+    signalsList.value.push(resSignalDetail.result.signal_info_list)
 
-      // 获取采集器信号信息枚举（一些比如中文是不会返回在详情接口的，需要从枚举中拿）
-      const resMenu = await fetchPostApi({
-        version: '1.0',
-        method: 'enum_signals',
-        id: '4',
-        params: {}
-      })
+    // 获取采集器信号信息枚举（一些比如中文是不会返回在详情接口的，需要从枚举中拿）
+    const resMenu = await fetchPostApi({
+      version: '1.0',
+      method: 'enum_signals',
+      id: '4',
+      params: {}
+    })
 
-      const tempList = [...resMenu.result.fixed_signals, ...resMenu.result.dynamic_signals]
+    const tempList = [...resMenu.result.fixed_signals, ...resMenu.result.dynamic_signals]
 
-      // 格式化信号枚举（通过信号id -> 信号obj）
-      for (const j in signalsList.value[i]) {
-        signalsList.value[i][j] = {
-          id: tempId,
-          ...signalsList.value[i][j],
-          ..._public.findObj(tempList, 'sig_id', signalsList.value[i][j].sig_id),
-          // isChecked: 1,
-          // isChecked: storeSignal.signalEnumList
-          //   ? storeSignal.signalEnumList[i].filter(item => item.isChecked)[0]?.isChecked
-          //   : 1,
-          // machineDetail.value.enable_signal_id_list：已经采集的信号
-          isChecked: machineDetail.value
-            .find(v => v.adapter_id === tempId)
-            .enable_signal_id_list.includes(signalsList.value[i][j].sig_id)
-            ? 1
-            : 0,
-          // 初始化 - 为了v-model不报错
-          realTimeData: {
-            val: ['--']
-          }
+    // 格式化信号枚举（通过信号id -> 信号obj）
+    for (const j in signalsList.value[i]) {
+      signalsList.value[i][j] = {
+        id: tempId,
+        ...signalsList.value[i][j],
+        ..._public.findObj(tempList, 'sig_id', signalsList.value[i][j].sig_id),
+        // isChecked: 1,
+        // isChecked: storeSignal.signalEnumList
+        //   ? storeSignal.signalEnumList[i].filter(item => item.isChecked)[0]?.isChecked
+        //   : 1,
+        // machineDetail.value.enable_signal_id_list：已经采集的信号
+        isChecked: machineDetail.value
+          .find(v => v.adapter_id === tempId)
+          .enable_signal_id_list.includes(signalsList.value[i][j].sig_id)
+          ? 1
+          : 0,
+        // 初始化 - 为了v-model不报错
+        realTimeData: {
+          val: ['--']
         }
       }
     }
-    storeSignal.changeSignalList(signalsList.value)
-    if (callback) {
-      callback()
-    }
+  }
+  storeSignal.changeSignalList(signalsList.value)
+  if (callback) {
+    callback()
   }
 
   // 开始订阅
@@ -826,6 +821,11 @@ const subscribeRealTime = async () => {
 }
 // 停止订阅实时数据
 const unsubscribeRealTime = async () => {
+  // 退订实时数据
+  _worker.postMessage({
+    type: 'stopPushData',
+    payload: {}
+  })
   // 取消订阅实时数据
   for (const adapter_id of adapterIds) {
     await fetchPostApi({
@@ -839,11 +839,6 @@ const unsubscribeRealTime = async () => {
       }
     })
   }
-  // 退订实时数据
-  _worker.postMessage({
-    type: 'stopPushData',
-    payload: {}
-  })
 }
 const popoverRef = ref()
 const asideTemp = [

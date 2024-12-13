@@ -243,7 +243,7 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
             let result = RealTimeData::parse_real_time_data(&data);
             match result {
                 Ok(value) => {
-                    println!("Decoded RealTimeData: {:?}", value);
+                    // println!("Decoded RealTimeData: {:?}", value);
                     let value = json!(value);
                     Ok(value)
                 }
@@ -269,11 +269,12 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
                 drop(nc_signal_manager);
                 match signal_data {
                     Some(mut signal_data) => {
-                        set_nc_signal_val(&mut signal_data, signal_value);
+                        set_nc_signal_val(&mut signal_data, signal_value).await;
                         let mut nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
                         nc_signal_manager
                             .realtime_data
                             .insert("dc".to_string(), signal_data);
+                        drop(nc_signal_manager);
                         // println!("update signal_data: {:?}", nc_signal_manager.realtime_data);
                     }
                     None => {
@@ -281,11 +282,12 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
                             NcSignalVal::new(signal_value.dev_id, signal_value.collector_id);
                         let mut realtime_data = HashMap::new();
                         realtime_data.insert(signal_value.collector_id, nc_signal_val);
-                        set_nc_signal_val(&mut realtime_data, signal_value);
+                        set_nc_signal_val(&mut realtime_data, signal_value).await;
                         let mut nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
                         nc_signal_manager
                             .realtime_data
                             .insert("dc".to_string(), realtime_data);
+                        drop(nc_signal_manager);
                         // println!("insert signal_data: {:?}", nc_signal_manager.realtime_data);
                     }
                 }
