@@ -217,7 +217,7 @@ const popoverRef = ref()
 // 连接/断连 改变连接状态
 const handleConnect = async () => {
   console.log(999, selectedItem.value)
-  const { id, connect_status, ids } = selectedItem.value
+  const { connect_status, ids } = selectedItem.value
   let tempMethod = 'adapter_connect'
   let tempId = '52'
   if (connect_status) {

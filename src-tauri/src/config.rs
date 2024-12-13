@@ -4,7 +4,6 @@ use std::{fs, str};
 use tokio::sync::Mutex;
 // use std::path::PathBuf;
 use lazy_static::lazy_static;
-use std::path::{Path, PathBuf};
 use tauri::AppHandle;
 
 //配置文件结构体
@@ -184,30 +183,12 @@ lazy_static! {
     pub static ref APP_CONFIG: Mutex<AppConfig> = Mutex::new(AppConfig::new());
 }
 
-/**
- * 读取配置文件
- */
-// pub fn app_config() -> Result<String, std::io::Error> {
-//     let config_path = Path::new("config/config.yml");
-//     let file_str = match std::fs::read_to_string(&config_path) {
-//         Ok(file_str) => file_str,
-//         Err(e) => return Err(e),
-//     };
-//     let app_config_obj: AppConfig = serde_yaml::from_str(&file_str).unwrap();
-//     let app_config_str = serde_json::to_string(&app_config_obj).unwrap();
-//     Ok(app_config_str)
-// }
 //读取配置文件
 pub async fn read_config(handle: &AppHandle) -> Result<AppConfig, Box<dyn std::error::Error>> {
     let config_path = handle
         .path_resolver()
         .resolve_resource("config/config.yml")
         .expect("failed to resolve resource");
-    // let config_path = Path::new("config/config.yml");
-    // // 打印 config_path
-
-    // let mut config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    // config_path.push("config/config.yml");
     let config_content = fs::read_to_string(config_path)?;
     let config: AppConfig = serde_yaml::from_str(&config_content)?;
     // 设置全局配置
