@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use std::{fs, str};
+use tokio::sync::Mutex;
 // use std::path::PathBuf;
-use std::path::{Path, PathBuf};
+use lazy_static::lazy_static;
+use tauri::AppHandle;
 
 //配置文件结构体
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -15,6 +17,79 @@ pub struct AppConfig {
     pub show_logo: bool,
     pub eoms: EomsConfig,
     pub monitor: MonitorConfig,
+}
+impl AppConfig {
+    fn new() -> AppConfig {
+        AppConfig {
+            dc: DcConfig {
+                http: HttpObj {
+                    host: "".to_string(),
+                    port: 0,
+                    port_decision: None,
+                    url: None,
+                    pre_url: None,
+                    decision_url: None,
+                },
+                tcp: TcpObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+            },
+            cloud: CloudConfig {
+                mcm: HostPortObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+                iedp: HostPortObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+            },
+            ips: IpsConfig {
+                tcp: HostPortObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+                http: HostPortObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+            },
+            socket_server: SocketServerObj {
+                tcp: PortObj { port: 0 },
+            },
+            local: LocalConfig {
+                http: HostPortObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+            },
+            show_logo: false,
+            eoms: EomsConfig {
+                http: HostPortObj {
+                    host: "".to_string(),
+                    port: 0,
+                },
+            },
+            monitor: MonitorConfig {
+                enable: false,
+                mqtt: MqttObj {
+                    host: "".to_string(),
+                },
+                dir: DirObj {
+                    win_error: "".to_string(),
+                },
+                interval: IntervalObj {
+                    win_orrer: 0,
+                    services: 0,
+                    all_lathe: 0,
+                    device: 0,
+                    alarm: 0,
+                },
+                env: "".to_string(),
+            },
+        }
+    }
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SocketServerObj {
@@ -104,28 +179,26 @@ pub struct IntervalObj {
     pub alarm: u64,
 }
 
-/**
- * 读取配置文件
- */
-// pub fn app_config() -> Result<String, std::io::Error> {
-//     let config_path = Path::new("config/config.yml");
-//     let file_str = match std::fs::read_to_string(&config_path) {
-//         Ok(file_str) => file_str,
-//         Err(e) => return Err(e),
-//     };
-//     let app_config_obj: AppConfig = serde_yaml::from_str(&file_str).unwrap();
-//     let app_config_str = serde_json::to_string(&app_config_obj).unwrap();
-//     Ok(app_config_str)
-// }
-//读取配置文件
-pub fn read_config() -> Result<AppConfig, Box<dyn std::error::Error>> {
-    let config_path = Path::new("config/config.yml");
-    // // 打印 config_path
+lazy_static! {
+    pub static ref APP_CONFIG: Mutex<AppConfig> = Mutex::new(AppConfig::new());
+}
 
-    // let mut config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    // config_path.push("config/config.yml");
-    println!("Config path: {:?}", config_path);
+//读取配置文件
+pub async fn read_config(handle: &AppHandle) -> Result<AppConfig, Box<dyn std::error::Error>> {
+    let config_path = handle
+        .path_resolver()
+        .resolve_resource("config/config.yml")
+        .expect("failed to resolve resource");
     let config_content = fs::read_to_string(config_path)?;
     let config: AppConfig = serde_yaml::from_str(&config_content)?;
+    // 设置全局配置
+    let mut app_config = APP_CONFIG.lock().await;
+    app_config.clone_from(&config);
+    println!("Config: {:?}", app_config);
     Ok(config)
+}
+
+pub async fn get_config() -> Result<AppConfig, Box<dyn std::error::Error>> {
+    let app_config = APP_CONFIG.lock().await;
+    Ok(app_config.clone())
 }
