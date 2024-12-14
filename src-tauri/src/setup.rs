@@ -2,6 +2,7 @@ use crate::api_server::start_server;
 use crate::config;
 use crate::msg_type::ProtocolHeader;
 use crate::tcp_client::{TcpClientManager, TcpConfig};
+use log::{error, info};
 use std::sync::Arc;
 use tauri::AppHandle;
 use tokio::sync::Mutex;
@@ -12,7 +13,6 @@ pub async fn set_up(handle: AppHandle) {
     let config = config::read_config(&handle_clone)
         .await
         .expect("failed to read config");
-    println!("{:?}", config);
 
     // 创建TCP客户端配置
     let client_config = TcpConfig {
@@ -48,9 +48,9 @@ pub async fn set_up(handle: AppHandle) {
             .add_client("dc".to_string(), client_config_clone, hearbeat)
             .await
         {
-            eprintln!("Failed to connect dc TCP client: {}", e);
+            error!("Failed to connect dc TCP client: {}", e);
         } else {
-            println!("dc TCP client connected successfully");
+            info!("dc TCP client connected successfully");
         }
     });
     // 使用异步任务启动 TCP 客户端连接，避免阻塞主线程
@@ -74,9 +74,9 @@ pub async fn set_up(handle: AppHandle) {
             .add_client("ips".to_string(), client_config_ips, hearbeat)
             .await
         {
-            eprintln!("Failed to connect ips TCP client: {}", e);
+            error!("Failed to connect ips TCP client: {}", e);
         } else {
-            println!("ips TCP client connected successfully");
+            info!("ips TCP client connected successfully");
         }
     });
 
@@ -84,7 +84,7 @@ pub async fn set_up(handle: AppHandle) {
     let manager_clone = manager.clone();
     tokio::spawn(async move {
         if let Err(e) = start_server(config.socket_server.tcp.port, manager_clone).await {
-            eprintln!("Failed to start server: {}", e);
+            error!("Failed to start server: {}", e);
         }
     });
 }

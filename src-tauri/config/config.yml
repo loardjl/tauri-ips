@@ -1,13 +1,13 @@
 dc:
   http:
-    host: 127.0.0.1
+    host: 172.16.10.237
     port: 10010
     port_decision: 10010
     url: /datacenter
     pre_url: /datacenter
     decision_url: /decision
   tcp:
-    host: 127.0.0.1
+    host: 172.16.10.237
     port: 9135
 cloud:
   mcm:
@@ -19,10 +19,10 @@ cloud:
 
 ips:
   tcp:
-    host: 127.0.0.1
+    host: 172.16.10.237
     port: 9142
   http:
-    host: 127.0.0.1
+    host: 172.16.10.237
     port: 9998
 
 socket_server:
@@ -31,7 +31,7 @@ socket_server:
 
 local:
   http:
-    host: 127.0.0.1
+    host: 172.16.10.237
     port: 10010
 
 show_logo: true

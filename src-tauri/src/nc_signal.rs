@@ -1,4 +1,4 @@
-use crate::utils::{read_bytes, read_f32, read_i32, read_string, read_u32, read_u64, read_u8};
+use crate::utils::{read_bytes, read_f32, read_i32, read_string, read_u32, read_u64};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

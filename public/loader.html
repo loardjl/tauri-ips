@@ -45,16 +45,18 @@
 
       .left {
         background: linear-gradient(-225deg, #ff3cac 0%, #2b86c5 58%, #ff3cac 100%);
-        right: 99px;
-        transform: rotate(90deg);
-        width: 600px;
+        right: 0;
+        transform: translate(50%, 0) rotate(90deg);
+        width: 100vh;
+        transform-origin: center;
       }
 
       .right {
-        left: 99px;
-        transform: rotate(90deg);
-        width: 600px;
+        left: 0;
+        transform: translate(-50%, 0) rotate(90deg);
+        width: 100vh;
         background: linear-gradient(-225deg, #ff3cac 0%, #2b86c5 58%, #ff3cac 100%);
+        transform-origin: center;
       }
 
       .bottom {

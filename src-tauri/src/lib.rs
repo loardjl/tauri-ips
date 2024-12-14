@@ -1,12 +1,14 @@
 mod api_server;
 mod config;
 mod front_data_type;
+mod log_set;
 mod msg_type;
 mod nc_signal;
 mod setup;
 mod tcp_client;
 mod utils;
 
+use log::info;
 use reqwest::header::{self, HeaderMap};
 use serde_json::Value;
 use setup::set_up;
@@ -20,7 +22,7 @@ use tokio::sync::Mutex;
 pub async fn run() {
     // 创建TcpClientManager
     let manager = Arc::new(Mutex::new(TcpClientManager::new()));
-
+    log_set::main();
     tauri::Builder::default()
         .manage(manager)
         .setup(|_app| {
@@ -61,7 +63,7 @@ async fn send_http_post_msg(url: String, data: Value) -> Result<String, ()> {
         header::CONTENT_TYPE,
         header::HeaderValue::from_static("application/json"),
     );
-    println!("url: {}, data: {:?}", url, data);
+    info!("url: {}, data: {:?}", url, data);
     let res = client
         .post(&url)
         .headers(headers)
@@ -70,7 +72,7 @@ async fn send_http_post_msg(url: String, data: Value) -> Result<String, ()> {
         .await
         .unwrap();
     let body = res.text().await.unwrap();
-    println!("res: {:?}", &body);
+    info!("res: {:?}", &body);
     Ok(body)
 }
 #[command]

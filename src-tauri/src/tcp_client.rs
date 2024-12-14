@@ -3,6 +3,7 @@ use crate::msg_type::{
 };
 use bincode::Options;
 use futures_util::lock::Mutex;
+use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str;
@@ -57,7 +58,7 @@ impl TcpClient {
 
         // 尝试启动监听
         client.start_listening().await.map_err(|e| {
-            eprintln!("Failed to start listening: {}", e);
+            error!("Failed to start listening: {}", e);
             e
         })?;
 
@@ -73,7 +74,7 @@ impl TcpClient {
                 .map(|byte| format!("{:02X}", byte))
                 .collect::<Vec<_>>()
                 .join(" ");
-            println!("Sending data: {:?}", hex_output);
+            info!("Sending data: {:?}", hex_output);
             writer.write_all(data).await?; // 写入数据
             Ok(())
         } else {
@@ -85,12 +86,12 @@ impl TcpClient {
     pub async fn start_listening(
         &mut self,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        println!("topic: {:?}", self.topic);
+        info!("topic: {:?}", self.topic);
         loop {
             match self.connect_and_listen().await {
                 Ok(_) => break, // 成功连接
                 Err(e) => {
-                    eprintln!(
+                    error!(
                         "{} Failed to connect: {}. Retrying in 5 seconds...",
                         self.topic, e
                     );
@@ -119,7 +120,7 @@ impl TcpClient {
         *status_lock = 1;
         drop(status_lock);
         let topic = self.topic.clone();
-        println!("connect_and_listen topic: {:?}", topic);
+        info!("connect_and_listen topic: {:?}", topic);
 
         // 消息接收任务
         let sender_clone = sender.clone();
@@ -134,7 +135,7 @@ impl TcpClient {
             loop {
                 match reader.read(&mut buffer).await {
                     Ok(0) => {
-                        println!("Server closed the connection.");
+                        info!("Server closed the connection.");
                         let mut status = status.lock().await;
                         *status = 0;
                         break; // 连接关闭
@@ -156,7 +157,7 @@ impl TcpClient {
                                 let header = match parse_protocol_header(header_bytes) {
                                     Ok(hdr) => hdr,
                                     Err(e) => {
-                                        eprintln!("Failed to deserialize header: {}", e);
+                                        error!("Failed to deserialize header: {}", e);
                                         return;
                                     }
                                 };
@@ -177,7 +178,7 @@ impl TcpClient {
                                 // 解析 order1 和 order2
                                 let order1 = u16::from_be_bytes([leftover[3], leftover[4]]);
                                 let order2 = u16::from_be_bytes([leftover[5], leftover[6]]);
-                                println!(
+                                info!(
                                     "order1: {:04X} order2: {:04X} topic: {}",
                                     order1, order2, &topic
                                 );
@@ -185,7 +186,6 @@ impl TcpClient {
                                 let processing_mode = get_process_mode(order1, order2);
                                 let msg = get_msg(order1, order2);
 
-                                println!("Processing mode: {:?}", processing_mode);
                                 process_data_segment(
                                     &mut leftover,
                                     pos,
@@ -203,7 +203,7 @@ impl TcpClient {
                         }
                     }
                     Err(e) => {
-                        eprintln!("Error reading: {}", e);
+                        error!("Error reading: {}", e);
                         let mut status = status.lock().await;
                         *status = 0;
                         break;
@@ -223,9 +223,9 @@ impl TcpClient {
                     let mut writer = writer_clone.lock().await;
 
                     let hearbeat_bytes = bytemuck::bytes_of(&hearbeat);
-                    eprintln!("hearbeat_bytes: {:?}", &topic);
+                    info!("hearbeat_bytes: {:?}", &topic);
                     if let Err(e) = writer.write_all(&hearbeat_bytes).await {
-                        eprintln!("Error sending heartbeat: {}", e);
+                        error!("Error sending heartbeat: {}", e);
                         break; // 连接断开，停止心跳任务
                     } else {
                         // println!("Sent heartbeat");
@@ -245,11 +245,11 @@ impl TcpClient {
             // 锁在此处释放
             drop(status);
             if disconnected {
-                println!("Disconnected. Reconnecting...");
+                warn!("Disconnected. Reconnecting...");
                 // 重连逻辑
                 match self.connect_and_listen().await {
-                    Ok(_) => println!("Reconnected successfully."),
-                    Err(e) => eprintln!("Failed to reconnect: {}", e),
+                    Ok(_) => info!("Reconnected successfully."),
+                    Err(e) => error!("Failed to reconnect: {}", e),
                 }
             } else {
                 // println!("Connection is healthy.");
@@ -328,7 +328,7 @@ async fn process_data_segment(
             };
             let serialized_data = serde_json::to_vec(&send_data).expect("Failed to serialize data");
             if let Err(e) = sender_clone.lock().await.send(serialized_data).await {
-                eprintln!("Failed to send data: {}", e);
+                error!("Failed to send data: {}", e);
             }
         }
     }
@@ -405,13 +405,13 @@ async fn handle_fragmented_data(
         let serialized_data = serde_json::to_vec(&send_data).expect("Failed to serialize data");
         // 通过 sender 发送合并后的数据
         if let Err(e) = sender.lock().await.send(serialized_data).await {
-            eprintln!("Failed to send merged data: {}", e);
+            error!("Failed to send merged data: {}", e);
         }
         handler.current_count = 0;
         handler.total_count = 0;
         handler.fragments.clear();
     } else {
-        println!("Waiting for more fragments...");
+        info!("Waiting for more fragments...");
     }
 }
 

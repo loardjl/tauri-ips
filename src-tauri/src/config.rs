@@ -4,6 +4,7 @@ use std::{fs, str};
 use tokio::sync::Mutex;
 // use std::path::PathBuf;
 use lazy_static::lazy_static;
+use log::info;
 use tauri::AppHandle;
 
 //配置文件结构体
@@ -194,7 +195,7 @@ pub async fn read_config(handle: &AppHandle) -> Result<AppConfig, Box<dyn std::e
     // 设置全局配置
     let mut app_config = APP_CONFIG.lock().await;
     app_config.clone_from(&config);
-    println!("Config: {:?}", app_config);
+    info!("Config: {:?}", app_config);
     Ok(config)
 }
 
