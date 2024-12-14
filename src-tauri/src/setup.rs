@@ -7,7 +7,7 @@ use std::sync::Arc;
 use tauri::AppHandle;
 use tokio::sync::Mutex;
 
-pub async fn set_up(handle: AppHandle) {
+pub async fn set_up(handle: &AppHandle) {
     let handle_clone = handle.clone();
     // 获取配置数据
     let config = config::read_config(&handle_clone)

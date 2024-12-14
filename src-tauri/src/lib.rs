@@ -22,7 +22,6 @@ use tokio::sync::Mutex;
 pub async fn run() {
     // 创建TcpClientManager
     let manager = Arc::new(Mutex::new(TcpClientManager::new()));
-    log_set::main();
     tauri::Builder::default()
         .manage(manager)
         .setup(|_app| {
@@ -31,7 +30,8 @@ pub async fn run() {
             let window = _app.get_window("main").unwrap();
             tauri::async_runtime::spawn(async move {
                 let app_handle = app_handle.clone();
-                set_up(app_handle).await;
+                log_set::main(&app_handle);
+                set_up(&app_handle).await;
                 // 在新任务上执行初始化代码，这样应用程序就不会冻结
                 std::thread::sleep(std::time::Duration::from_secs(5)); // 模拟初始化
                 loading_window.close().unwrap();

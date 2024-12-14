@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_yaml;
-use std::{fs, str};
+use std::{fs, path::Path, str};
 use tokio::sync::Mutex;
 // use std::path::PathBuf;
 use lazy_static::lazy_static;
@@ -186,10 +186,19 @@ lazy_static! {
 
 //读取配置文件
 pub async fn read_config(handle: &AppHandle) -> Result<AppConfig, Box<dyn std::error::Error>> {
-    let config_path = handle
-        .path_resolver()
-        .resolve_resource("config/config.yml")
-        .expect("failed to resolve resource");
+    let config_path = {
+        #[cfg(debug_assertions)]
+        {
+            Path::new("dev/config.yml")
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            handle
+                .path_resolver()
+                .resolve_resource("config/config.yml")
+                .expect("failed to resolve resource")
+        }
+    };
     let config_content = fs::read_to_string(config_path)?;
     let config: AppConfig = serde_yaml::from_str(&config_content)?;
     // 设置全局配置
