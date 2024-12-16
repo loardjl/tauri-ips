@@ -391,15 +391,15 @@ const workpieceStrategy = async () => {
     )
     const data = res
     data.result.strategies.forEach(item => {
-      item.optimize_ctrl_learn_factor = item.optimize_ctrl_learn_factor.toFixed(1)
-      item.overload_protection_learn_factor = item.overload_protection_learn_factor.toFixed(1)
+      item.optimize_ctrl_learn_factor = +item.optimize_ctrl_learn_factor.toFixed(1)
+      item.overload_protection_learn_factor = +item.overload_protection_learn_factor.toFixed(1)
       item.overload_protection_feed_rate = (item.overload_protection_feed_rate * 100).toFixed(0)
       item.optimize_ctrl_feed_rate = (item.optimize_ctrl_feed_rate * 100).toFixed(0)
       item.optimize_ctrl_max_feed_rate = (item.optimize_ctrl_max_feed_rate * 100).toFixed(0)
       item.optimize_ctrl_min_feed_rate = (item.optimize_ctrl_min_feed_rate * 100).toFixed(0)
       item.touch_feed_rate = (item.touch_feed_rate * 100).toFixed(0)
       item.touch_protection_rate = (item.touch_protection_rate * 100).toFixed(0)
-      item.touch_entry_protection_time = (item.touch_entry_protection_time / 1000).toFixed(1)
+      item.touch_entry_protection_time = +(item.touch_entry_protection_time / 1000).toFixed(1)
       item.touch_revival_duration = (item.touch_revival_duration / 1000).toFixed(0)
     })
     strategiesid.value = data.result.strategies[0].strategy_id
@@ -421,7 +421,7 @@ const setStrategyFun = async () => {
   ]
   Promise.all(promises)
     .then(async () => {
-      const copystrategiesItem = JSON.parse(JSON.stringify(strategiesItem.value))
+      let copystrategiesItem = JSON.parse(JSON.stringify(strategiesItem.value))
       copystrategiesItem.overload_protection_feed_rate =
         copystrategiesItem.overload_protection_feed_rate / 100
       copystrategiesItem.optimize_ctrl_feed_rate = copystrategiesItem.optimize_ctrl_feed_rate / 100
@@ -449,6 +449,7 @@ const setStrategyFun = async () => {
         const data = res
         popoverRef.value.confirmFun()
         strategiesItem.value = {}
+        copystrategiesItem = {}
         if (!data.result.status) proxy.$alertMsg('checked', '', '保存成功', { type: 'success' })
         else proxy.$alertMsg('clear', '', '保存失败', { type: 'danger' })
         workpieceStrategy()
