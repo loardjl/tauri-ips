@@ -147,7 +147,7 @@
             <van-form
               colon
               label-align="right"
-              :validate-trigger="['onChange', 'onBlur']"
+              :validate-trigger="['onChange', 'onBlur', 'onClick']"
               ref="optimizectrBtn"
             >
               <integer
@@ -157,7 +157,9 @@
                 title="上限进给倍率(%)"
                 :rules="[
                   {
-                    validator: optimizectrlmax
+                    validator: strategiesItem.optimize_ctrl_max_feed_rate_enable
+                      ? optimizectrlmax
+                      : ''
                   }
                 ]"
                 :disabled="!strategiesItem.optimize_ctrl_max_feed_rate_enable ? true : false"
@@ -169,7 +171,9 @@
                 title="下限进给倍率(%)"
                 :rules="[
                   {
-                    validator: optimizectrlmin
+                    validator: strategiesItem.optimize_ctrl_max_feed_rate_enable
+                      ? optimizectrlmin
+                      : ''
                   }
                 ]"
                 :disabled="!strategiesItem.optimize_ctrl_max_feed_rate_enable ? true : false"
