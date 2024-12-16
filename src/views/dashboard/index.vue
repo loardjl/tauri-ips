@@ -9,18 +9,18 @@
             <span
               class="text-optimize"
               :class="[
-                realtimeInfo.strategy_status === 1
+                realtimeInfo.strategy_status === 0
                   ? 'greens'
                   : realtimeInfo.strategy_status === 2
-                  ? 'yellow'
-                  : 'grey'
+                  ? 'grey'
+                  : 'yellow'
               ]"
               >{{
-                realtimeInfo.strategy_status === 1
+                realtimeInfo.strategy_status === 0
                   ? '效率优先'
                   : realtimeInfo.strategy_status === 2
-                  ? '过程关闭'
-                  : '优化关闭'
+                  ? '优化关闭'
+                  : '过程等待'
               }}</span
             >
           </div>
