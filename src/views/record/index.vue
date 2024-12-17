@@ -111,7 +111,7 @@ onMounted(() => {
       key: 'next',
       text: '下一页',
       disable: computed(() => {
-        return pageAll.value < 0 || startPage.value === pageAll.value ? true : false
+        return pageAll.value <= 0 || startPage.value === pageAll.value ? true : false
       }),
       cb: () => {
         nextFun()
@@ -220,8 +220,6 @@ const toolhistoryFun = async () => {
       'ipsbatch'
     )
     const data = res
-    console.log(data)
-
     strategies.forEach(item => {
       data.result.workpiece_tool_historys.forEach(j => {
         j.strategy_historys.forEach(i => {

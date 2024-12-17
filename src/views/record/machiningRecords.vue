@@ -96,7 +96,7 @@ onMounted(() => {
       key: 'next',
       text: '下一页',
       disable: computed(() => {
-        return pageAll.value < 0 || startPage.value === pageAll.value ? true : false
+        return pageAll.value <= 0 || startPage.value === pageAll.value ? true : false
       }),
       cb: () => {
         nextFun()
@@ -131,6 +131,8 @@ const workpiece_history = async () => {
     })
     tableData.value = data.result.process_historys
     total.value = data.result.total
+    console.log(parseInt(data.result.total / count.value))
+
     pageAll.value = parseInt(data.result.total / count.value)
   } catch (e) {
     console.log(e)
