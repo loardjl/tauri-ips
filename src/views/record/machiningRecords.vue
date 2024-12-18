@@ -96,7 +96,9 @@ onMounted(() => {
       key: 'next',
       text: '下一页',
       disable: computed(() => {
-        return pageAll.value <= 0 || startPage.value === pageAll.value ? true : false
+        return pageAll.value <= 0 || startPage.value === pageAll.value || pageAll.value === 1
+          ? true
+          : false
       }),
       cb: () => {
         nextFun()
