@@ -242,17 +242,30 @@ export const _public = {
   },
   //秒转 秒 小时 分钟 天
   getTime(time, format, isHour = true) {
-    time = time / 1000
+    // 如果 time 是负数，先转为正数，然后标记为负
+    const isNegative = time < 0
+    time = Math.abs(time) / 1000 // 将毫秒转换为秒，并取绝对值
+
     const d = parseInt(time / 60 / 60 / 24)
     const h = isHour ? parseInt((time / 60 / 60) % 24) : parseInt(time / 60 / 60)
     const m = parseInt((time / 60) % 60)
     const s = parseInt(time % 60)
+
+    // 格式化时的替换对象
     const replacements = {
       d: d.toString().padStart(2, '0'),
-      h: h.toString().padStart(2, '0'), // 格式化为两位数
+      h: h.toString().padStart(2, '0'),
       m: m.toString().padStart(2, '0'),
       s: s.toString().padStart(2, '0')
     }
-    return format.replace(/{(d|h|m|s)}/g, (_, key) => replacements[key])
+
+    // 如果时间是负数，确保输出是负的
+    if (isNegative) {
+      // 在所有数字前加上负号
+      return '-' + format.replace(/{(d|h|m|s)}/g, (_, key) => replacements[key])
+    } else {
+      // 正常情况
+      return format.replace(/{(d|h|m|s)}/g, (_, key) => replacements[key])
+    }
   }
 }

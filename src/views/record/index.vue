@@ -2,7 +2,7 @@
   <div class="record">
     <div class="filterItems">
       <span>工件型号</span>
-      <span>(共1111件)：</span>
+      <span>(共{{ dataList.length }}件)：</span>
       <div class="selsect">
         <van-field
           v-model="program_num"
