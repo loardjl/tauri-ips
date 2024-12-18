@@ -303,6 +303,7 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
                 Err(e) => Err(format!("Failed to parse GetToken: {}", e)),
             }
         }
+        MsgType::IpsRegister => Ok(json!("")),
         MsgType::Unknown => Err("Unknown message type".to_string()),
     }
 }

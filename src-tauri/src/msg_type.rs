@@ -60,6 +60,7 @@ pub fn get_process_mode(order1: u16, order2: u16) -> ProcessingMode {
     mode_map.insert((0x0016, 0x0103), ProcessingMode::Fragmented);
     mode_map.insert((0x0000, 0x0103), ProcessingMode::Fragmented);
     mode_map.insert((0x8000, 0x0101), ProcessingMode::Fragmented);
+    mode_map.insert((0x8016, 0x0101), ProcessingMode::Direct);
 
     mode_map
         .get(&(order1, order2))
@@ -161,6 +162,7 @@ pub enum MsgType {
     OptimizeInfo,
     NcSignalVal,
     GetToken,
+    IpsRegister,
     Unknown, // 未知类型
 }
 
@@ -171,6 +173,7 @@ impl MsgType {
             MsgType::OptimizeInfo => "OptimizeInfo".to_string(),
             MsgType::NcSignalVal => "NcSignalVal".to_string(),
             MsgType::GetToken => "GetToken".to_string(),
+            MsgType::IpsRegister => "IpsRegister".to_string(),
             MsgType::Unknown => "Unknown".to_string(),
         }
     }
@@ -182,6 +185,7 @@ pub fn get_msg(order1: u16, order2: u16) -> MsgType {
     mode_map.insert((0x0016, 0x0103), MsgType::OptimizeInfo);
     mode_map.insert((0x0000, 0x0103), MsgType::NcSignalVal);
     mode_map.insert((0x8000, 0x0101), MsgType::GetToken);
+    mode_map.insert((0x8016, 0x0101), MsgType::IpsRegister);
     mode_map
         .get(&(order1, order2))
         .cloned()

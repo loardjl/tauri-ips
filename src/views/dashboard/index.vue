@@ -155,6 +155,9 @@ onMounted(() => {
     }
   ]
   init()
+  worker.dispatch('IpsRegister', () => {
+    getstrategFun()
+  })
   worker.send('IpsRegister', {})
   worker.dispatch('RealTimeData', ({ payload }) => {
     payload.Ok.strategy_feedback = (payload.Ok.strategy_feedback * 100).toFixed(0)
@@ -163,7 +166,6 @@ onMounted(() => {
     init()
     // console.log('RealTimeData', payload)
   })
-  getstrategFun()
   worker.dispatch('OptimizeInfo', ({ payload }) => {
     console.log('OptimizeInfo', payload)
     payload.Ok.total_optimize_time =
