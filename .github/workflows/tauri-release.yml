@@ -47,14 +47,3 @@ jobs:
         with:
           name: Debian Bundle
           path: ${{ github.workspace }}/src-tauri/target/release/bundle/deb/${{ env.APP_NAME }}_${{ env.APP_VERSION }}_arm64.deb
-      - name: Upload rpm bundle
-        uses: actions/upload-artifact@v3
-        with:
-          name: RPM Bundle
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/rpm/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-1.aarch64.rpm
-
-      - name: Upload appimage bundle
-        uses: actions/upload-artifact@v3
-        with:
-          name: AppImage Bundle
-          path: ${{ github.workspace }}/src-tauri/target/release/bundle/appimage/${{ env.APP_NAME }}_${{ env.APP_VERSION }}_aarch64.AppImage
