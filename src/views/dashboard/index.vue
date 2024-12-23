@@ -120,13 +120,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="jsx">
 import { onMounted, inject, ref, computed, getCurrentInstance } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMenuStore } from '@src/store/useMenu'
 import { useApi } from '@src/hooks/useApi'
 import { useSignalController } from '@src/hooks/useSignalController'
 import { _public } from '@src/utils/common'
+import popover from '@components/common/popover/inedx.vue'
 const { proxy } = getCurrentInstance()
 const echarts = inject('echarts')
 const menuStore = useMenuStore()
@@ -138,12 +139,40 @@ onMounted(() => {
     {
       key: 'relearn',
       sort: 0,
-      text: '重新学习',
+      text: ' ',
       disable: computed(() => (realtimeInfo.value.program_number === '' ? true : false)),
-      cb: () => {
-        relearnFun()
-      },
-      auth: '*' // 权限, *或者不提供该字段 为所有权限
+      // cb: () => {
+      //   relearnFun()
+      // },
+      auth: '*', // 权限, *或者不提供该字段 为所有权限
+      render: () => {
+        return (
+          <popover ref={popoverRef} contentText="是否重新学习?" trigger="重新学习">
+            {{
+              operate: () => {
+                return (
+                  <>
+                    <span
+                      onClick={() => {
+                        popoverRef.value.cancelFun()
+                      }}
+                    >
+                      取消
+                    </span>
+                    <span
+                      onClick={() => {
+                        relearnFun()
+                      }}
+                    >
+                      确定
+                    </span>
+                  </>
+                )
+              }
+            }}
+          </popover>
+        )
+      }
     },
     {
       key: 'strategy',
@@ -201,6 +230,8 @@ const realtimeInfo = ref({
   strategy_feedback: 0,
   nc_knob_feedback: 0
 })
+
+const popoverRef = ref(null)
 const relearnFun = async () => {
   if (realtimeInfo.value.program_number === '') return
   try {
@@ -216,6 +247,7 @@ const relearnFun = async () => {
       'ipsbatch'
     )
     const data = res
+    popoverRef.value.confirmFun()
     if (!data.result.status) proxy.$alertMsg('checked', '', '重新学习成功', { type: 'success' })
     else proxy.$alertMsg('clear', '', '重新学习失败', { type: 'danger' })
   } catch (e) {
