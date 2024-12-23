@@ -78,7 +78,8 @@ onMounted(() => {
           path: '/record/machiningRecords/dataDetails',
           state: {
             rowValue: JSON.stringify(rowValue.value),
-            program_name: parameter.program_name
+            program_name: parameter.program_name,
+            process_start_time: rowValue.value.total_process_start_time
           }
         })
         sessionStorage.setItem('machiningPage', JSON.stringify(startPage.value))
@@ -126,15 +127,12 @@ const workpiece_history = async () => {
       'ipsbatch'
     )
     const data = res
-    console.log(data)
     data.result.process_historys.forEach(item => {
       item.actual_time = _public.getTime(item.actual_time, '{h}:{m}:{s}', false)
       item.standard_time = _public.getTime(item.standard_time, '{h}:{m}:{s}', false)
     })
     tableData.value = data.result.process_historys
     total.value = data.result.total
-    console.log(parseInt(data.result.total / count.value))
-
     pageAll.value = parseInt(data.result.total / count.value)
   } catch (e) {
     console.log(e)
@@ -196,10 +194,10 @@ const nextFun = () => {
     min-height: 0px !important;
   }
   :deep(.row--hover) {
-    background-color: rgb(241, 241, 241) !important;
+    background-color: transparent !important;
   }
   :deep(.row--current) {
-    background-color: rgb(241, 241, 241);
+    background-color: rgb(241, 241, 241) !important;
   }
 }
 </style>

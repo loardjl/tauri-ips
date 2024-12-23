@@ -107,6 +107,7 @@ const process_history = async () => {
         params: {
           program_name: history.state.program_name,
           workpiece_id: rowValue.workpiece_id,
+          total_process_start_time: history.state.process_start_time,
           start: startPage.value * count.value,
           count: count.value
         }

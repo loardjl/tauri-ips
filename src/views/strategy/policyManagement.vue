@@ -247,11 +247,11 @@
               />
             </div>
             <integer
-              label="在生效持续时间"
+              label="再生效持续时间"
               name="touchfeed"
               v-model="strategiesItem.touch_revival_duration"
-              title="在生效持续时间(s)"
-              :rules="[{ required: true, message: '请输入在生效持续时间' }]"
+              title="再生效持续时间(s)"
+              :rules="[{ required: true, message: '请输入再生效持续时间' }]"
               :disabled="!strategiesItem.touch_entry_protection_enable ? true : false"
             />
             <decimal
@@ -276,8 +276,8 @@
             />
           </van-form>
           <!-- <div>
-            <span>在生效持续时间:</span>
-            <integer v-model="strategiesItem.touch_revival_duration" title="在生效持续时间(s)" />
+            <span>再生效持续时间:</span>
+            <integer v-model="strategiesItem.touch_revival_duration" title="再生效持续时间(s)" />
           </div>
           <div>
             <span>切入保护时间:</span>
