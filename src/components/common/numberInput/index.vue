@@ -1,8 +1,8 @@
 <template>
   <div class="number-input">
-    <VanButton type="primary" @click="sub">-</VanButton>
+    <VanButton type="primary" @click="sub"><van-icon name="minus" /></VanButton>
     <VanField v-model="inputValue" v-limitInput:num="[min, max]" :disabled="isDisabled"></VanField>
-    <VanButton type="primary" @click="add">+</VanButton>
+    <VanButton type="primary" @click="add"><van-icon name="plus" /></VanButton>
   </div>
 </template>
 
@@ -52,7 +52,7 @@ const sub = () => {
     height: 100%;
     border: none;
     border-radius: 0;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 400;
   }
   .van-cell {

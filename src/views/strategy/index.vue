@@ -320,9 +320,11 @@ const saveFun = () => {
       }
       :deep(.van-picker__cancel) {
         font-size: 22px;
+        width: 100px;
       }
       :deep(.van-picker__confirm) {
         font-size: 22px;
+        width: 100px;
       }
       :deep(.van-picker-column__item) {
         font-size: 22px;
@@ -360,6 +362,37 @@ const saveFun = () => {
   :deep(.vxe-body--row) {
     height: 65px;
     color: rgb(102, 102, 102);
+    .vxe-body--column {
+      height: 65px;
+      .vxe-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        .radio {
+          display: flex;
+          justify-content: center;
+          height: 100%;
+          width: 100%;
+          .van-radio-group {
+            width: 100%;
+            height: 100%;
+            & > div {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+            }
+            // height: 50px;
+            // width: 50px;
+          }
+        }
+      }
+      // :deep(.vxe-cell) {
+      //   height: 60px;
+
+      // }
+    }
   }
   :deep(.vxe-table--body-wrapper) {
     min-height: 0px !important;
@@ -369,10 +402,6 @@ const saveFun = () => {
   }
   :deep(.row--current) {
     background-color: rgb(241, 241, 241);
-  }
-  .radio {
-    display: flex;
-    justify-content: center;
   }
 }
 </style>

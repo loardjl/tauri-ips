@@ -313,9 +313,11 @@ const dataList = ref([])
       }
       :deep(.van-picker__cancel) {
         font-size: 22px;
+        width: 100px;
       }
       :deep(.van-picker__confirm) {
         font-size: 22px;
+        width: 100px;
       }
       :deep(.van-picker-column__item) {
         font-size: 22px;
@@ -336,6 +338,10 @@ const dataList = ref([])
         .van-cell__value {
           font-size: 22px;
         }
+      }
+      :deep(.van-calendar__confirm) {
+        height: 54px;
+        font-size: 22px;
       }
       :deep(.van-popup--right.van-popup--round) {
         border-radius: 4px;

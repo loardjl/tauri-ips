@@ -183,9 +183,11 @@ const save = async () => {
         }
         :deep(.van-picker__cancel) {
           font-size: 22px;
+          width: 100px;
         }
         :deep(.van-picker__confirm) {
           font-size: 22px;
+          width: 100px;
         }
         :deep(.van-picker-column__item) {
           font-size: 22px;
