@@ -1,5 +1,5 @@
 <template>
-  <div class="ch1-wrap">
+  <div class="ch1-wrap" :class="tabType === 4 ? 'custom-wrap' : ''">
     <div v-if="isEdit">
       <van-form colon label-align="right" label-width="180">
         <template v-for="child in signalsListItemForm" :key="child.sig_id + child.addr_type">
@@ -315,6 +315,25 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @import '../style.scss';
+.custom-wrap {
+  .conbine-input {
+    width: 100%;
+    .label {
+      width: 110px;
+    }
+    .van-cell {
+      width: 250px !important;
+    }
+  }
+  .list-con {
+    .item {
+      width: 25%;
+    }
+    .label {
+      width: 110px;
+    }
+  }
+}
 .conbine-input {
   width: 50%;
   .label {
