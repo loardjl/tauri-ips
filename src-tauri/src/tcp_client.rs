@@ -178,10 +178,10 @@ impl TcpClient {
                                 // 解析 order1 和 order2
                                 let order1 = u16::from_be_bytes([leftover[3], leftover[4]]);
                                 let order2 = u16::from_be_bytes([leftover[5], leftover[6]]);
-                                info!(
-                                    "order1: {:04X} order2: {:04X} topic: {}",
-                                    order1, order2, &topic
-                                );
+                                // info!(
+                                //     "order1: {:04X} order2: {:04X} topic: {}",
+                                //     order1, order2, &topic
+                                // );
                                 // 判断数据处理模式
                                 let processing_mode = get_process_mode(order1, order2);
                                 let msg = get_msg(order1, order2);

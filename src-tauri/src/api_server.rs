@@ -113,14 +113,12 @@ async fn handle_tcp_messages(client_name: &str, manager: TcpClientManager1, sock
                         if send_data.is_json {
                             match serde_json::from_slice::<Value>(&data) {
                                 Ok(parsed_response) => {
-                                    info!("Received response (JSON): {:?}", parsed_response);
                                     socket.emit(msg_str, &parsed_response).ok();
                                 }
                                 Err(e) => error!("Failed to parse JSON response: {}", e),
                             }
                         } else {
                             let decoded = decode_data(data, &msg, &topic).await;
-                            info!("Received response: {:?}", decoded);
                             if msg == MsgType::NcSignalVal {
                                 continue;
                             }
@@ -204,6 +202,9 @@ async fn handle_connec(
     socket.on("startPushData", move |Data::<Value>(data)| {
         info!("Received startPushData message: {:?}", data);
         tokio::spawn(async move {
+            let mut nc_signal_manager = NC_SIGNAL_MANAGER.lock().await;
+            nc_signal_manager.realtime_data.clear();
+            drop(nc_signal_manager);
             let mut start_push_data = START_PUSH_DATA.lock().await;
             *start_push_data = true;
             drop(start_push_data);
