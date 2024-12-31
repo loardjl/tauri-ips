@@ -1,1 +1,8 @@
-export default ['OptimizeInfo', 'RealTimeData', 'GetToken', 'StartPushData', 'IpsRegister']
+export default [
+  'OptimizeInfo',
+  'RealTimeData',
+  'GetToken',
+  'StartPushData',
+  'IpsRegister',
+  'DCStatus'
+]

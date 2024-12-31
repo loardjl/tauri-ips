@@ -163,6 +163,7 @@ pub enum MsgType {
     NcSignalVal,
     GetToken,
     IpsRegister,
+    DCStatus,
     Unknown, // 未知类型
 }
 
@@ -175,6 +176,7 @@ impl MsgType {
             MsgType::GetToken => "GetToken".to_string(),
             MsgType::IpsRegister => "IpsRegister".to_string(),
             MsgType::Unknown => "Unknown".to_string(),
+            MsgType::DCStatus => "DCStatus".to_string(),
         }
     }
 }

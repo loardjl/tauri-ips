@@ -153,7 +153,7 @@ async fn maintain_connection(client_name: &str, manager: TcpClientManager1) {
 
     loop {
         let mut client = client.lock().await;
-        client.watch_connection().await;
+        client.watch_connection(client_name).await;
         drop(client);
         tokio::time::sleep(Duration::from_secs(5)).await;
     }
@@ -304,6 +304,7 @@ async fn decode_data(data: Vec<u8>, msg: &MsgType, topic: &str) -> Result<Value,
             }
         }
         MsgType::IpsRegister => Ok(json!("")),
+        MsgType::DCStatus => Ok(json!("")),
         MsgType::Unknown => Err("Unknown message type".to_string()),
     }
 }

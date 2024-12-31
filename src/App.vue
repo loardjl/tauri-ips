@@ -57,6 +57,10 @@ const getRole = async () => {
   sysInfo.value.role = res
 }
 
+worker.dispatch('DCStatus', () => {
+  getDcStatus()
+})
+
 const getDcStatus = () => {
   // 数据中心服务连接状态推送
   worker.send('getToken', {})

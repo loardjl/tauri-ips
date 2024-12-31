@@ -237,7 +237,7 @@ impl TcpClient {
         Ok(())
     }
     // 重连
-    pub async fn watch_connection(&mut self) {
+    pub async fn watch_connection(&mut self, topic: &str) {
         {
             // 每次循环加锁
             let status = self.status.lock().await;
@@ -248,7 +248,27 @@ impl TcpClient {
                 warn!("Disconnected. Reconnecting...");
                 // 重连逻辑
                 match self.connect_and_listen().await {
-                    Ok(_) => info!("Reconnected successfully."),
+                    Ok(_) => {
+                        info!("Reconnected successfully.");
+                        let sender_clone = self.sender.clone();
+                        let topic_clone = topic.to_string();
+                        tokio::spawn(async move {
+                            if topic_clone == "dc" {
+                                let send_data = SendData {
+                                    data: serde_json::to_vec(&"DCStatus").unwrap(),
+                                    is_json: true,
+                                    msg: MsgType::DCStatus,
+                                };
+                                let serialized_data = serde_json::to_vec(&send_data)
+                                    .expect("Failed to serialize data");
+                                if let Err(e) =
+                                    sender_clone.lock().await.send(serialized_data).await
+                                {
+                                    error!("Failed to send data: {}", e);
+                                }
+                            }
+                        });
+                    }
                     Err(e) => error!("Failed to reconnect: {}", e),
                 }
             } else {
@@ -418,7 +438,6 @@ async fn handle_fragmented_data(
 pub struct TcpClientManager {
     pub clients: HashMap<String, Arc<Mutex<TcpClient>>>,
 }
-
 impl TcpClientManager {
     pub fn new() -> Self {
         TcpClientManager {
@@ -440,5 +459,8 @@ impl TcpClientManager {
 
     pub fn get_client(&self, topic: &str) -> Option<Arc<Mutex<TcpClient>>> {
         self.clients.get(topic).cloned()
+    }
+    pub fn remove_client(&mut self, topic: &str) -> Option<Arc<Mutex<TcpClient>>> {
+        self.clients.remove(topic)
     }
 }
