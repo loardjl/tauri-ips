@@ -22,7 +22,13 @@
       </div>
       <div class="timeDate">
         <van-cell title="选择日期区间" :value="date" @click="show = true" />
-        <van-calendar v-model:show="show" type="range" @confirm="onConfirm" position="right" />
+        <van-calendar
+          v-model:show="show"
+          type="range"
+          @confirm="onConfirm"
+          position="right"
+          :min-date="new Date(1990, 0, 1)"
+        />
       </div>
     </div>
     <div class="content" v-if="dataList.length">
