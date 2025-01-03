@@ -117,9 +117,7 @@ onMounted(() => {
       key: 'next',
       text: '下一页',
       disable: computed(() => {
-        return pageAll.value <= 0 || startPage.value === pageAll.value || pageAll.value === 1
-          ? true
-          : false
+        return pageAll.value <= 0 || startPage.value === pageAll.value ? true : false
       }),
       cb: () => {
         nextFun()
@@ -240,7 +238,7 @@ const toolhistoryFun = async () => {
     })
     dataList.value = data.result.workpiece_tool_historys
     total.value = data.result.total
-    pageAll.value = parseInt(data.result.total / cont.value)
+    pageAll.value = Math.ceil(data.result.total / cont.value) - 1
   } catch (e) {
     console.log(e)
   }
