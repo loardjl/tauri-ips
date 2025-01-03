@@ -86,9 +86,20 @@
           <div>200%</div>
         </div>
         <div class="magnification">
-          <div><span>进给控制倍率</span> / <span>进给旋钮倍率</span></div>
           <div>
-            <span>{{ realtimeInfo.strategy_feedback }}%</span>&ensp;/
+            <span
+              :style="realtimeInfo.strategy_status === 0 ? 'color: #42b4d2;' : ' color: #4e5969;'"
+              >进给控制倍率</span
+            >
+            / <span>进给旋钮倍率</span>
+          </div>
+          <div>
+            <span
+              :style="realtimeInfo.strategy_status === 0 ? 'color: #42b4d2;' : ' color: #4e5969;'"
+              >{{
+                realtimeInfo.strategy_status === 0 ? realtimeInfo.strategy_feedback + '%' : '--'
+              }}</span
+            >&ensp;/
             <span>{{ realtimeInfo.nc_knob_feedback }}%</span>
           </div>
         </div>
