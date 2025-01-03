@@ -200,8 +200,11 @@ onMounted(() => {
   })
   worker.send('IpsRegister', {})
   worker.dispatch('RealTimeData', ({ payload }) => {
-    payload.Ok.strategy_feedback = (payload.Ok.strategy_feedback * 100).toFixed(0)
-    payload.Ok.nc_knob_feedback = (payload.Ok.nc_knob_feedback * 100).toFixed(0)
+    payload.Ok.strategy_feedback = +(payload.Ok.strategy_feedback * 100).toFixed(0)
+    payload.Ok.nc_knob_feedback = +(payload.Ok.nc_knob_feedback * 100).toFixed(0)
+    if (payload?.Ok?.strategy_status !== 0) {
+      payload.Ok.strategy_feedback = 0
+    }
     realtimeInfo.value = payload.Ok
     init()
     // console.log('RealTimeData', payload)
@@ -329,7 +332,7 @@ const init = () => {
           min: 0,
           max: 200,
           itemStyle: {
-            color: '#42B4D2'
+            color: realtimeInfo.value.strategy_status === 0 ? '#42B4D2' : '#4A3AFF1A'
           },
           progress: {
             show: true,
@@ -413,6 +416,8 @@ const init = () => {
   } else {
     option = myChart.getOption()
     option.series[0].data[0].value = realtimeInfo.value.strategy_feedback
+    option.series[0].itemStyle.color =
+      realtimeInfo.value.strategy_status === 0 ? '#42B4D2' : '#4A3AFF1A'
     option.series[1].data[0].value = realtimeInfo.value.nc_knob_feedback
   }
 
