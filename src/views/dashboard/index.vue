@@ -17,7 +17,7 @@
               ]"
               >{{
                 realtimeInfo.strategy_status === 0
-                  ? '效率优先'
+                  ? '效率优化'
                   : realtimeInfo.strategy_status === 2
                   ? '优化关闭'
                   : '过程等待'
