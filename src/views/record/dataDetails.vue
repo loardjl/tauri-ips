@@ -11,14 +11,15 @@
       </div>
       <div>
         <span>优化后:</span>
-        <span>{{ rowValue.actual_time }}</span>
+        <span>{{ rowValue.optimize_enable ? rowValue.actual_time : '-' }}</span>
       </div>
       <div>
         <span>节省时间(s)/比率(s):</span>
-        <span
+        <span v-if="rowValue.optimize_enable"
           >{{ (rowValue.optimize_time / 1000).toFixed(2) }} /
           {{ rowValue.optimize_ratio.toFixed(2) }}%</span
         >
+        <span v-else>-</span>
       </div>
     </div>
     <div class="table">
